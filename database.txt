@@ -1,0 +1,80 @@
+-- 1. New Authors Table (Dashboard Profile, Login & Payout Details)
+CREATE TABLE `authors_dashboard_profile` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `global_author_id` int NOT NULL, -- Links to `author_id` in your OLD database
+  
+  -- Authentication
+  `username` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `password_hash` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  
+  -- Override Fields (Optional): 
+  `email_override` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `phone_override` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `bio_override` text COLLATE utf8mb4_general_ci,
+  `photo_override` text COLLATE utf8mb4_general_ci,
+
+  -- New Private / Financial Details
+  `legal_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `full_address` text COLLATE utf8mb4_general_ci,
+  
+  `bank_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `account_number` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `ifsc_code` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `pan_number` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tds_rate` decimal(5,2) DEFAULT 10.00,
+  `gstin` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  
+  `is_active` tinyint(1) DEFAULT 1, 
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_global_author_id` (`global_author_id`),
+  UNIQUE KEY `idx_username` (`username`) -- Ensures no two authors can claim the same username
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- 2. Social Links Table
+CREATE TABLE `social_links` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `profile_id` int NOT NULL, -- Links to the `id` of `authors_dashboard_profile`
+  `platform` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `url` varchar(512) COLLATE utf8mb4_general_ci NOT NULL,
+  `handle` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  
+  PRIMARY KEY (`id`),
+  KEY `idx_profile_id` (`profile_id`),
+  CONSTRAINT `fk_social_profile` FOREIGN KEY (`profile_id`) REFERENCES `authors_dashboard_profile` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 3. Transactions / Sales Table
+CREATE TABLE `transactions` (
+  `id` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `global_book_id` int NOT NULL, -- Links to your OLD database's books table
+  `global_author_id` int NOT NULL, -- Links directly to the OLD database author_id
+  `transaction_date` date NOT NULL,
+  `platform` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `sale_format` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `units` int NOT NULL DEFAULT '1',
+  `price` decimal(10,2) NOT NULL,
+  `royalty` decimal(10,2) NOT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  
+  PRIMARY KEY (`id`),
+  KEY `idx_transaction_date` (`transaction_date`),
+  KEY `idx_global_book_id` (`global_book_id`),
+  KEY `idx_global_author_id` (`global_author_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `book_approvals` (
+  `approval_id` int NOT NULL AUTO_INCREMENT,
+  `book_id` int NOT NULL,
+  `author_id` int NOT NULL,
+  `approval_type` enum('cover_design', 'digital_proof', 'print_confirmation') NOT NULL,
+  `approved_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `ip_address` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`approval_id`),
+  UNIQUE KEY `unique_book_approval` (`book_id`, `approval_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
