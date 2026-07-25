@@ -157,33 +157,33 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-ink tracking-tight mb-1">Ratings & Reviews</h1>
-          <p className="text-[14px] text-ink/60 font-medium">Track reader feedback across all platforms</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-1">Ratings & Reviews</h1>
+          <p className="text-[14px] text-slate-500 font-medium">Track reader feedback across all platforms</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
             <button
               onClick={() => setIsDatePickerOpen((v) => !v)}
-              className="flex items-center gap-2 text-[13px] font-semibold bg-panel shadow-card text-ink px-4 py-2 rounded-full hover:bg-cream transition-colors border border-ink/10"
+              className="flex items-center gap-2 text-[13px] font-semibold bg-white shadow-sm text-slate-900 px-4 py-2 rounded-full hover:bg-slate-50 transition-colors border border-slate-200"
             >
-              <Calendar size={14} className="text-ink/60" />
+              <Calendar size={14} className="text-slate-500" />
               {activePeriod.label}
               <ChevronDown
                 size={14}
-                className={`text-ink/60 ml-1 transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`}
+                className={`text-slate-500 ml-1 transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`}
               />
             </button>
 
             {isDatePickerOpen && (
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setIsDatePickerOpen(false)} />
-                <div className="absolute right-0 mt-2 w-72 bg-panel rounded-xl2 shadow-card border border-ink/10 p-4 z-30">
-                  <div className="flex gap-1 mb-4 bg-ink/5 rounded-full p-1">
+                <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl2 shadow-sm border border-slate-200 p-4 z-30">
+                  <div className="flex gap-1 mb-4 bg-slate-100 rounded-full p-1">
                     {(["preset", "single", "range", "month"] as FilterMode[]).map((m) => (
                       <button
                         key={m}
                         onClick={() => setFilterMode(m)}
-                        className={`flex-1 text-[11px] font-bold py-1.5 rounded-full capitalize transition-colors ${filterMode === m ? "bg-ink text-white" : "text-ink/60 hover:text-ink"}`}
+                        className={`flex-1 text-[11px] font-bold py-1.5 rounded-full capitalize transition-colors ${filterMode === m ? "bg-slate-900 text-white" : "text-slate-500 hover:text-slate-900"}`}
                       >
                         {m === "preset" ? "Quick" : m}
                       </button>
@@ -196,7 +196,7 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
                         <button
                           key={d}
                           onClick={() => { setPresetDays(d as any); setIsDatePickerOpen(false); }}
-                          className={`text-left text-[13px] font-semibold px-3 py-2 rounded-lg transition-colors ${presetDays === d ? "bg-ink text-white" : "hover:bg-cream text-ink"}`}
+                          className={`text-left text-[13px] font-semibold px-3 py-2 rounded-lg transition-colors ${presetDays === d ? "bg-slate-900 text-white" : "hover:bg-slate-50 text-slate-900"}`}
                         >
                           {d === "all" ? "All Time" : `Last ${d} Days`}
                         </button>
@@ -206,27 +206,27 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
 
                   {filterMode === "single" && (
                     <div className="flex flex-col gap-2">
-                      <label className="text-[11px] font-semibold text-ink/60">Pick a date</label>
-                      <input type="date" value={singleDate} max={today} onChange={(e) => setSingleDate(e.target.value)} className="w-full text-[13px] font-medium text-ink bg-cream rounded-lg px-3 py-2 outline-none" />
-                      <button onClick={() => setIsDatePickerOpen(false)} className="mt-1 text-[12px] font-bold bg-ink text-white rounded-lg py-2">Apply</button>
+                      <label className="text-[11px] font-semibold text-slate-500">Pick a date</label>
+                      <input type="date" value={singleDate} max={today} onChange={(e) => setSingleDate(e.target.value)} className="w-full text-[13px] font-medium text-slate-900 bg-slate-50 rounded-lg px-3 py-2 outline-none" />
+                      <button onClick={() => setIsDatePickerOpen(false)} className="mt-1 text-[12px] font-bold bg-slate-900 text-white rounded-lg py-2">Apply</button>
                     </div>
                   )}
 
                   {filterMode === "range" && (
                     <div className="flex flex-col gap-2">
-                      <label className="text-[11px] font-semibold text-ink/60">Start date</label>
-                      <input type="date" value={rangeStart} max={rangeEnd} onChange={(e) => setRangeStart(e.target.value)} className="w-full text-[13px] font-medium text-ink bg-cream rounded-lg px-3 py-2 outline-none" />
-                      <label className="text-[11px] font-semibold text-ink/60 mt-1">End date</label>
-                      <input type="date" value={rangeEnd} min={rangeStart} max={today} onChange={(e) => setRangeEnd(e.target.value)} className="w-full text-[13px] font-medium text-ink bg-cream rounded-lg px-3 py-2 outline-none" />
-                      <button onClick={() => setIsDatePickerOpen(false)} className="mt-1 text-[12px] font-bold bg-ink text-white rounded-lg py-2">Apply</button>
+                      <label className="text-[11px] font-semibold text-slate-500">Start date</label>
+                      <input type="date" value={rangeStart} max={rangeEnd} onChange={(e) => setRangeStart(e.target.value)} className="w-full text-[13px] font-medium text-slate-900 bg-slate-50 rounded-lg px-3 py-2 outline-none" />
+                      <label className="text-[11px] font-semibold text-slate-500 mt-1">End date</label>
+                      <input type="date" value={rangeEnd} min={rangeStart} max={today} onChange={(e) => setRangeEnd(e.target.value)} className="w-full text-[13px] font-medium text-slate-900 bg-slate-50 rounded-lg px-3 py-2 outline-none" />
+                      <button onClick={() => setIsDatePickerOpen(false)} className="mt-1 text-[12px] font-bold bg-slate-900 text-white rounded-lg py-2">Apply</button>
                     </div>
                   )}
 
                   {filterMode === "month" && (
                     <div className="flex flex-col gap-2">
-                      <label className="text-[11px] font-semibold text-ink/60">Pick a month</label>
-                      <input type="month" value={monthValue} max={today.slice(0, 7)} onChange={(e) => setMonthValue(e.target.value)} className="w-full text-[13px] font-medium text-ink bg-cream rounded-lg px-3 py-2 outline-none" />
-                      <button onClick={() => setIsDatePickerOpen(false)} className="mt-1 text-[12px] font-bold bg-ink text-white rounded-lg py-2">Apply</button>
+                      <label className="text-[11px] font-semibold text-slate-500">Pick a month</label>
+                      <input type="month" value={monthValue} max={today.slice(0, 7)} onChange={(e) => setMonthValue(e.target.value)} className="w-full text-[13px] font-medium text-slate-900 bg-slate-50 rounded-lg px-3 py-2 outline-none" />
+                      <button onClick={() => setIsDatePickerOpen(false)} className="mt-1 text-[12px] font-bold bg-slate-900 text-white rounded-lg py-2">Apply</button>
                     </div>
                   )}
                 </div>
@@ -236,7 +236,7 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
 
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-2 bg-ink text-white px-5 py-2 rounded-full text-[13px] font-bold shadow-md hover:bg-ink/90 transition-colors"
+            className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2 rounded-full text-[13px] font-bold shadow-md hover:bg-slate-100 transition-colors"
           >
             <Download size={16} />
             Export CSV
@@ -248,47 +248,47 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         {/* Overall Rating Card */}
-        <div className="bg-panel rounded-2xl shadow-card p-6 flex flex-col md:col-span-1 relative overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col md:col-span-1 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-yellow/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
 
-          <h3 className="text-[13px] font-bold text-ink/60 uppercase tracking-wider mb-4">Overall Rating</h3>
+          <h3 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-4">Overall Rating</h3>
 
           <div className="flex items-end gap-3 mb-3">
-            <div className="text-4xl font-black text-ink">{summaryData.averageRating}</div>
-            <div className="text-sm font-semibold text-ink/60">out of 5</div>
+            <div className="text-4xl font-black text-slate-900">{summaryData.averageRating}</div>
+            <div className="text-sm font-semibold text-slate-500">out of 5</div>
           </div>
           <div className="flex gap-1 mt-3 mb-1">
             {[1, 2, 3, 4, 5].map((s) => (
               <Star
                 key={s}
                 size={18}
-                className={s <= Math.round(summaryData.averageRating) ? "fill-ink text-ink" : "fill-ink/10 text-transparent"}
+                className={s <= Math.round(summaryData.averageRating) ? "fill-yellow text-yellow" : "fill-ink/10 text-transparent"}
               />
             ))}
           </div>
-          <p className="text-xs font-semibold text-ink/50 mt-1">{summaryData.totalReviews.toLocaleString()} Global Ratings</p>
+          <p className="text-xs font-semibold text-slate-500 mt-1">{summaryData.totalReviews.toLocaleString()} Global Ratings</p>
 
-          <div className="mt-auto pt-4 border-t border-ink/5">
+          <div className="mt-auto pt-4 border-t border-slate-200">
             <div className="flex items-center justify-between text-[12px] font-bold">
-              <span className="text-ink/60">Versus last month</span>
+              <span className="text-slate-500">Versus last month</span>
               <span className="text-green flex items-center gap-1"><ArrowUpRight size={14} /> +0.2</span>
             </div>
           </div>
         </div>
 
         {/* Rating Distribution */}
-        <div className="bg-panel rounded-2xl shadow-card p-6 flex flex-col md:col-span-2">
-          <h3 className="text-[13px] font-bold text-ink/60 uppercase tracking-wider mb-4">Rating Distribution</h3>
+        <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col md:col-span-2">
+          <h3 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-4">Rating Distribution</h3>
 
           <div className="flex flex-col gap-2.5 flex-1 justify-center">
             {summaryData.distribution.map((dist) => (
               <div key={dist.stars} className="flex items-center gap-3">
                 <div className="flex items-center gap-1 w-12 shrink-0">
-                  <span className="text-[13px] font-bold text-ink">{dist.stars}</span>
+                  <span className="text-[13px] font-bold text-slate-900">{dist.stars}</span>
                   <Star size={12} className="text-yellow" fill="currentColor" />
                 </div>
 
-                <div className="flex-1 h-2.5 bg-ink/5 rounded-full overflow-hidden">
+                <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-yellow to-pink rounded-full"
                     style={{ width: `${dist.percent}%` }}
@@ -296,7 +296,7 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
                 </div>
 
                 <div className="w-16 text-right shrink-0">
-                  <span className="text-[12px] font-medium text-ink/60">{dist.percent}%</span>
+                  <span className="text-[12px] font-medium text-slate-500">{dist.percent}%</span>
                 </div>
               </div>
             ))}
@@ -308,22 +308,22 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
       <div className="relative">
         <button
           onClick={() => scrollCarousel("left")}
-          className="hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-panel shadow-card items-center justify-center text-ink hover:bg-cream transition-colors"
+          className="hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white shadow-sm items-center justify-center text-slate-900 hover:bg-slate-50 transition-colors"
           aria-label="Scroll left"
         >
           <ChevronLeft size={16} />
         </button>
 
-        <div className="w-full overflow-x-auto no-scrollbar pb-2">
-          <div className="flex gap-4 min-w-max px-2" ref={carouselRef}>
+        <div className="w-full overflow-x-auto no-scrollbar pb-2 scroll-smooth" ref={carouselRef}>
+          <div className="flex gap-4 min-w-max px-2">
             <button
               onClick={() => setSelectedBook(null)}
               className={`flex-shrink-0 w-32 flex flex-col gap-3 group transition-opacity ${selectedBook === null ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
             >
-              <div className={`w-full aspect-[2/3] rounded-xl flex items-center justify-center border-2 transition-colors ${selectedBook === null ? 'border-ink bg-ink/5' : 'border-transparent bg-ink/5'}`}>
-                <BookOpen size={32} className="text-ink/40" />
+              <div className={`w-full aspect-[2/3] rounded-xl flex items-center justify-center border-2 transition-colors ${selectedBook === null ? 'border-slate-300 bg-slate-100' : 'border-transparent bg-slate-100'}`}>
+                <BookOpen size={32} className="text-slate-500" />
               </div>
-              <p className="text-[11px] font-bold text-ink/80 truncate w-full text-center">All Books</p>
+              <p className="text-[11px] font-bold text-slate-500 truncate w-full text-center">All Books</p>
             </button>
 
             {booksData.map((book: any, idx: number) => (
@@ -336,19 +336,19 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
                   <img
                     src={`${storeUrl}${book.coverImage}`}
                     alt={book.title}
-                    className={`w-full h-full  rounded-xl shadow-card border-2 transition-colors ${selectedBook === book.title ? 'border-ink' : 'border-transparent'}`}
+                    className={`w-full h-full  rounded-xl shadow-sm border-2 transition-colors ${selectedBook === book.title ? 'border-slate-300' : 'border-transparent'}`}
                   />
                 ) : (
                   <div
                     style={{ background: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' }}
-                    className={`w-full h-full rounded-xl shadow-card border-2 transition-colors flex items-end p-3 ${selectedBook === book.title ? 'border-ink' : 'border-transparent'}`}
+                    className={`w-full h-full rounded-xl shadow-sm border-2 transition-colors flex items-end p-3 ${selectedBook === book.title ? 'border-slate-300' : 'border-transparent'}`}
                   >
                     <div className="bg-white/90 backdrop-blur text-[10px] font-bold px-2 py-1 rounded w-full text-left truncate shadow-sm">
                       {book.title}
                     </div>
                   </div>
                 )}
-                <p className="text-[11px] font-bold text-ink/80 truncate w-full text-center">{book.title}</p>
+                <p className="text-[11px] font-bold text-slate-500 truncate w-full text-center">{book.title}</p>
               </button>
             ))}
           </div>
@@ -356,7 +356,7 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
 
         <button
           onClick={() => scrollCarousel("right")}
-          className="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-panel shadow-card items-center justify-center text-ink hover:bg-cream transition-colors"
+          className="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white shadow-sm items-center justify-center text-slate-900 hover:bg-slate-50 transition-colors"
           aria-label="Scroll right"
         >
           <ChevronRight size={16} />
@@ -364,27 +364,27 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
       </div>
 
       {/* Filters and Search inline */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 bg-white p-2 rounded-2xl border border-ink/10 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative">
             <select
               value={filterPlatform}
               onChange={(e) => setFilterPlatform(e.target.value)}
-              className="appearance-none bg-ink/5 hover:bg-ink/10 transition-colors border-none rounded-xl py-2 pl-4 pr-10 text-[13px] font-bold text-ink outline-none cursor-pointer"
+              className="appearance-none bg-slate-100 hover:bg-slate-100 transition-colors border-none rounded-xl py-2 pl-4 pr-10 text-[13px] font-bold text-slate-900 outline-none cursor-pointer"
             >
               <option>All Platforms</option>
               <option>Amazon</option>
               <option>Flipkart</option>
               <option>AGPH Website</option>
             </select>
-            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/60 pointer-events-none" />
+            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
           </div>
 
           <div className="relative">
             <select
               value={filterRating}
               onChange={(e) => setFilterRating(e.target.value)}
-              className="appearance-none bg-ink/5 hover:bg-ink/10 transition-colors border-none rounded-xl py-2 pl-4 pr-10 text-[13px] font-bold text-ink outline-none cursor-pointer"
+              className="appearance-none bg-slate-100 hover:bg-slate-100 transition-colors border-none rounded-xl py-2 pl-4 pr-10 text-[13px] font-bold text-slate-900 outline-none cursor-pointer"
             >
               <option>All Ratings</option>
               <option>5 Stars</option>
@@ -393,7 +393,7 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
               <option>2 Stars</option>
               <option>1 Star</option>
             </select>
-            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/60 pointer-events-none" />
+            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
           </div>
         </div>
 
@@ -403,9 +403,9 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
             placeholder="Search reviews or books..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-ink/10 focus:border-ink/30 rounded-xl py-2 pl-9 pr-4 text-[13px] font-medium text-ink outline-none transition-colors"
+            className="w-full bg-white border border-slate-200 focus:border-slate-200 rounded-xl py-2 pl-9 pr-4 text-[13px] font-medium text-slate-900 outline-none transition-colors"
           />
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/40" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
         </div>
       </div>
 
@@ -415,10 +415,10 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
           filteredReviews.map((review: any, index: number) => (
             <div
               key={review.id}
-              className="bg-panel rounded-2xl shadow-card p-5 flex flex-col hover:shadow-md transition-shadow group relative overflow-hidden"
+              className="bg-white rounded-xl shadow-sm p-5 flex flex-col hover:shadow-md transition-shadow group relative overflow-hidden"
             >
               {/* Decorative quote watermark */}
-              <Quote size={80} className="absolute -top-3 -right-3 text-ink/[0.03] rotate-12" />
+              <Quote size={80} className="absolute -top-3 -right-3 text-orange-200/30 rotate-12" />
 
               {/* Header */}
               <div className="flex items-start justify-between gap-3 mb-4 relative z-10">
@@ -430,8 +430,8 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
                     {review.reviewer.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
                   </div>
                   <div>
-                    <h4 className="text-[13px] font-bold text-ink">{review.reviewer}</h4>
-                    <p className="text-[11px] font-medium text-ink/50">{review.date}</p>
+                    <h4 className="text-[13px] font-bold text-slate-900">{review.reviewer}</h4>
+                    <p className="text-[11px] font-medium text-slate-500">{review.date}</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5 shrink-0">
@@ -441,7 +441,7 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
                         key={s}
                         size={12}
                         fill={s <= review.rating ? "currentColor" : "none"}
-                        className={s <= review.rating ? "text-yellow" : "text-ink/15"}
+                        className={s <= review.rating ? "text-yellow" : "text-slate-500"}
                       />
                     ))}
                   </div>
@@ -459,23 +459,23 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
 
               {/* Book tag */}
               <div className="mb-3">
-                <span className="text-[10px] font-bold text-ink/40 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                   {review.book}
                 </span>
               </div>
 
               {/* Review text */}
-              <p className="text-[13px] text-ink/75 leading-relaxed flex-1">
+              <p className="text-[13px] text-slate-500 leading-relaxed flex-1">
                 &ldquo;{review.text}&rdquo;
               </p>
 
               {/* Footer */}
-              <div className="mt-4 flex items-center justify-between pt-3 border-t border-ink/5">
-                <button className="flex items-center gap-1.5 text-[11px] font-bold text-ink/40 hover:text-ink transition-colors">
+              <div className="mt-4 flex items-center justify-between pt-3 border-t border-slate-200">
+                <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-900 transition-colors">
                   <ThumbsUp size={12} />
                   Helpful ({review.helpfulCount})
                 </button>
-                <button className="flex items-center gap-1.5 text-[11px] font-bold text-ink/40 hover:text-ink transition-colors">
+                <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-900 transition-colors">
                   <MessageCircle size={12} />
                   Reply
                 </button>
@@ -483,10 +483,10 @@ export default function ReviewsPageCo({ initialData, storeUrl = "http://localhos
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-ink/10 shadow-sm">
-            <MessageCircle size={48} className="mx-auto text-ink/20 mb-4" />
-            <h3 className="text-[16px] font-bold text-ink mb-1">No reviews found</h3>
-            <p className="text-[13px] text-ink/60">Try adjusting your filters or search query.</p>
+          <div className="col-span-full text-center py-16 bg-white rounded-xl border border-slate-200 shadow-sm">
+            <MessageCircle size={48} className="mx-auto text-slate-500 mb-4" />
+            <h3 className="text-[16px] font-bold text-slate-900 mb-1">No reviews found</h3>
+            <p className="text-[13px] text-slate-500">Try adjusting your filters or search query.</p>
           </div>
         )}
       </div>

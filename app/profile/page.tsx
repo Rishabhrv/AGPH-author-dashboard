@@ -1,10 +1,17 @@
 import AppShell from "@/components/layout/AppShell";
 import ProfilePageCo from "@/components/profile/ProfilePageCo";
+import { getAuthorProfileData, getAuthorSalesData, getAuthorReviewsData } from "@/actions/auth";
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const [profileData, salesData, reviewsData] = await Promise.all([
+    getAuthorProfileData(),
+    getAuthorSalesData(),
+    getAuthorReviewsData()
+  ]);
+  
   return (
     <AppShell active="profile">
-      <ProfilePageCo />
+      <ProfilePageCo initialProfileData={profileData} salesData={salesData} reviewsData={reviewsData} />
     </AppShell>
   );
 }

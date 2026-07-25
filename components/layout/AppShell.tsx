@@ -1,5 +1,6 @@
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
+import OnboardingWrapper from "./OnboardingWrapper";
 
 export default function AppShell({
   active,
@@ -13,7 +14,9 @@ export default function AppShell({
       <Sidebar active={active} />
       <div className="flex-1 min-w-0 flex flex-col gap-5 py-1 p-5">
         <TopBar />
-        {children}
+        <OnboardingWrapper>
+          {children}
+        </OnboardingWrapper>
       </div>
     </div>
   );

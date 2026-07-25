@@ -8,8 +8,8 @@ body {
 }
 
 body {
-  background-color: #EFEBDD;
-  color: #17171A;
+  background-color: #f4f7fb;
+  color: #0f172a;
 }
 
 * {
@@ -27,8 +27,8 @@ body {
 }
 
 .frame {
-  background-color: #F5F1E7;
-  border: 1px solid #E7E2D6;
+  background-color: transparent;
+  border: none;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */

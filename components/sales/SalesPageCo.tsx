@@ -344,10 +344,10 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-[26px] font-extrabold text-ink tracking-tight">
+          <h1 className="text-2xl sm:text-[26px] font-extrabold text-slate-900 tracking-tight">
             Sales & Revenue
           </h1>
-          <p className="text-[13px] text-muted mt-1">
+          <p className="text-[13px] text-slate-500 mt-1">
             Tracking {snapshot.books.length} {snapshot.books.length === 1 ? "book" : "books"} across Amazon, Flipkart & AGPH. Select one below to filter.
           </p>
         </div>
@@ -355,26 +355,26 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
           <div className="relative">
             <button
               onClick={() => setIsDatePickerOpen((v) => !v)}
-              className="flex items-center gap-2 text-[13px] font-semibold bg-panel shadow-card text-ink px-4 py-2 rounded-full hover:bg-cream transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink/40"
+              className="flex items-center gap-2 text-[13px] font-semibold bg-white shadow-sm text-slate-900 px-4 py-2 rounded-full hover:bg-slate-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink/40"
             >
-              <Calendar size={14} className="text-ink/60" />
+              <Calendar size={14} className="text-slate-500" />
               {activePeriod.label}
               <ChevronDown
                 size={14}
-                className={`text-ink/60 ml-1 transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`}
+                className={`text-slate-500 ml-1 transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`}
               />
             </button>
 
             {isDatePickerOpen && (
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setIsDatePickerOpen(false)} />
-                <div className="absolute right-0 mt-2 w-72 bg-panel rounded-xl2 shadow-card border border-ink/10 p-4 z-30">
-                  <div className="flex gap-1 mb-4 bg-ink/5 rounded-full p-1">
+                <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl2 shadow-sm border border-slate-200 p-4 z-30">
+                  <div className="flex gap-1 mb-4 bg-slate-100 rounded-full p-1">
                     {(["preset", "single", "range", "month"] as FilterMode[]).map((m) => (
                       <button
                         key={m}
                         onClick={() => setFilterMode(m)}
-                        className={`flex-1 text-[11px] font-bold py-1.5 rounded-full capitalize transition-colors ${filterMode === m ? "bg-ink text-white" : "text-ink/60 hover:text-ink"
+                        className={`flex-1 text-[11px] font-bold py-1.5 rounded-full capitalize transition-colors ${filterMode === m ? "bg-slate-900 text-white" : "text-slate-500 hover:text-slate-900"
                           }`}
                       >
                         {m === "preset" ? "Quick" : m}
@@ -391,7 +391,7 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
                             setPresetDays(d);
                             setIsDatePickerOpen(false);
                           }}
-                          className={`text-left text-[13px] font-semibold px-3 py-2 rounded-lg transition-colors ${presetDays === d ? "bg-ink text-white" : "hover:bg-cream text-ink"
+                          className={`text-left text-[13px] font-semibold px-3 py-2 rounded-lg transition-colors ${presetDays === d ? "bg-slate-900 text-white" : "hover:bg-slate-50 text-slate-900"
                             }`}
                         >
                           Last {d} Days
@@ -402,17 +402,17 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
 
                   {filterMode === "single" && (
                     <div className="flex flex-col gap-2">
-                      <label className="text-[11px] font-semibold text-ink/60">Pick a date</label>
+                      <label className="text-[11px] font-semibold text-slate-500">Pick a date</label>
                       <input
                         type="date"
                         value={singleDate}
                         max={today}
                         onChange={(e) => setSingleDate(e.target.value)}
-                        className="w-full text-[13px] font-medium text-ink bg-cream rounded-lg px-3 py-2 outline-none"
+                        className="w-full text-[13px] font-medium text-slate-900 bg-slate-50 rounded-lg px-3 py-2 outline-none"
                       />
                       <button
                         onClick={() => setIsDatePickerOpen(false)}
-                        className="mt-1 text-[12px] font-bold bg-ink text-white rounded-lg py-2"
+                        className="mt-1 text-[12px] font-bold bg-slate-900 text-white rounded-lg py-2"
                       >
                         Apply
                       </button>
@@ -421,26 +421,26 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
 
                   {filterMode === "range" && (
                     <div className="flex flex-col gap-2">
-                      <label className="text-[11px] font-semibold text-ink/60">Start date</label>
+                      <label className="text-[11px] font-semibold text-slate-500">Start date</label>
                       <input
                         type="date"
                         value={rangeStart}
                         max={rangeEnd}
                         onChange={(e) => setRangeStart(e.target.value)}
-                        className="w-full text-[13px] font-medium text-ink bg-cream rounded-lg px-3 py-2 outline-none"
+                        className="w-full text-[13px] font-medium text-slate-900 bg-slate-50 rounded-lg px-3 py-2 outline-none"
                       />
-                      <label className="text-[11px] font-semibold text-ink/60 mt-1">End date</label>
+                      <label className="text-[11px] font-semibold text-slate-500 mt-1">End date</label>
                       <input
                         type="date"
                         value={rangeEnd}
                         min={rangeStart}
                         max={today}
                         onChange={(e) => setRangeEnd(e.target.value)}
-                        className="w-full text-[13px] font-medium text-ink bg-cream rounded-lg px-3 py-2 outline-none"
+                        className="w-full text-[13px] font-medium text-slate-900 bg-slate-50 rounded-lg px-3 py-2 outline-none"
                       />
                       <button
                         onClick={() => setIsDatePickerOpen(false)}
-                        className="mt-1 text-[12px] font-bold bg-ink text-white rounded-lg py-2"
+                        className="mt-1 text-[12px] font-bold bg-slate-900 text-white rounded-lg py-2"
                       >
                         Apply
                       </button>
@@ -449,17 +449,17 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
 
                   {filterMode === "month" && (
                     <div className="flex flex-col gap-2">
-                      <label className="text-[11px] font-semibold text-ink/60">Pick a month</label>
+                      <label className="text-[11px] font-semibold text-slate-500">Pick a month</label>
                       <input
                         type="month"
                         value={monthValue}
                         max={today.slice(0, 7)}
                         onChange={(e) => setMonthValue(e.target.value)}
-                        className="w-full text-[13px] font-medium text-ink bg-cream rounded-lg px-3 py-2 outline-none"
+                        className="w-full text-[13px] font-medium text-slate-900 bg-slate-50 rounded-lg px-3 py-2 outline-none"
                       />
                       <button
                         onClick={() => setIsDatePickerOpen(false)}
-                        className="mt-1 text-[12px] font-bold bg-ink text-white rounded-lg py-2"
+                        className="mt-1 text-[12px] font-bold bg-slate-900 text-white rounded-lg py-2"
                       >
                         Apply
                       </button>
@@ -472,7 +472,7 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
 
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-2 text-[13px] font-semibold bg-ink text-white px-4 py-2 rounded-full hover:opacity-90 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink/40"
+            className="flex items-center gap-2 text-[13px] font-semibold bg-slate-900 text-white px-4 py-2 rounded-full hover:opacity-90 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink/40"
           >
             <Download size={14} />
             Export CSV
@@ -484,7 +484,7 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
       <div className="relative">
         <button
           onClick={() => scrollCarousel("left")}
-          className="hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-panel shadow-card items-center justify-center text-ink hover:bg-cream transition-colors"
+          className="hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white shadow-sm items-center justify-center text-slate-900 hover:bg-slate-50 transition-colors"
           aria-label="Scroll left"
         >
           <ChevronLeft size={16} />
@@ -498,12 +498,12 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
             onClick={() => setSelectedBook(null)}
             className={`snap-start flex-shrink-0 w-32 flex flex-col gap-2 group transition-opacity ${!selectedBook ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
           >
-            <div className={`w-full aspect-[2/3] rounded-xl flex items-center justify-center bg-panel shadow-card border-2 transition-colors ${!selectedBook ? 'border-ink' : 'border-transparent'}`}>
-              <BookOpen size={24} className={!selectedBook ? 'text-ink' : 'text-ink/40'} />
+            <div className={`w-full aspect-[2/3] rounded-xl flex items-center justify-center bg-white shadow-sm border-2 transition-colors ${!selectedBook ? 'border-slate-300' : 'border-transparent'}`}>
+              <BookOpen size={24} className={!selectedBook ? 'text-slate-900' : 'text-slate-500'} />
             </div>
             <div className="flex items-center justify-between px-0.5">
-              <p className="text-[12px] font-bold text-ink">All Books</p>
-              <p className="text-[10px] font-semibold text-ink/50">{periodTxns.reduce((s: number, t: any) => s + t.units, 0)}u</p>
+              <p className="text-[12px] font-bold text-slate-900">All Books</p>
+              <p className="text-[10px] font-semibold text-slate-500">{periodTxns.reduce((s: number, t: any) => s + t.units, 0)}u</p>
             </div>
           </button>
 
@@ -521,7 +521,7 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
                   {badgeStyle && (
                     <span
                       style={badgeStyle}
-                      className="absolute -top-1 -left-2 z-10 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold shadow-card border-2 border-white"
+                      className="absolute -top-1 -left-2 z-10 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold shadow-sm border-2 border-white"
                     >
                       #{rank}
                     </span>
@@ -530,12 +530,12 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
                     <img
                       src={`${storeUrl}${book.coverImage}`}
                       alt={book.title}
-                      className={`w-full h-full rounded-xl shadow-card border-2 transition-colors ${selectedBook === book.title ? 'border-ink' : 'border-transparent'}`}
+                      className={`w-full h-full rounded-xl shadow-sm border-2 transition-colors ${selectedBook === book.title ? 'border-slate-300' : 'border-transparent'}`}
                     />
                   ) : (
                     <div
                       style={{ background: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' }}
-                      className={`w-full h-full  rounded-xl shadow-card border-2 transition-colors flex items-end p-3 ${selectedBook === book.title ? 'border-ink' : 'border-transparent'}`}
+                      className={`w-full h-full  rounded-xl shadow-sm border-2 transition-colors flex items-end p-3 ${selectedBook === book.title ? 'border-slate-300' : 'border-transparent'}`}
                     >
                       <div className="bg-white/90 backdrop-blur text-[10px] font-bold px-2 py-1 rounded w-full text-left truncate shadow-sm">
                         {book.title}
@@ -544,8 +544,8 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
                   )}
                 </div>
                 <div className="flex items-center justify-between px-0.5">
-                  <p className="text-[11px] font-semibold text-ink/60 truncate">{activePeriod.label}</p>
-                  <p className="text-[10px] font-bold text-ink/70 shrink-0 ml-1">{unitsInPeriod}u</p>
+                  <p className="text-[11px] font-semibold text-slate-500 truncate">{activePeriod.label}</p>
+                  <p className="text-[10px] font-bold text-slate-500 shrink-0 ml-1">{unitsInPeriod}u</p>
                 </div>
               </button>
             );
@@ -554,7 +554,7 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
 
         <button
           onClick={() => scrollCarousel("right")}
-          className="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-panel shadow-card items-center justify-center text-ink hover:bg-cream transition-colors"
+          className="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white shadow-sm items-center justify-center text-slate-900 hover:bg-slate-50 transition-colors"
           aria-label="Scroll right"
         >
           <ChevronRight size={16} />
@@ -563,59 +563,61 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
 
       {/* Top Summary Metrics (3-up) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="bg-yellow rounded-xl2 p-5 flex flex-col shadow-card">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-full bg-ink/10 flex items-center justify-center text-ink">
-              <IndianRupee size={16} strokeWidth={2.5} />
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">
+              {selectedBook ? 'Filtered Lifetime' : 'Lifetime Earnings'}
+            </span>
+            <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
+              <IndianRupee className="h-4 w-4 text-[#275697]" />
             </div>
-            <p className="text-sm font-semibold text-ink/80">{selectedBook ? 'Filtered Lifetime' : 'Lifetime Earnings'}</p>
           </div>
-          <p className="text-2xl font-extrabold text-ink mb-1">
+          <div className="mt-3 text-2xl font-black text-slate-900">
             {formatINR(selectedBookLifetimeEarnings)}
-          </p>
-          <p className="text-[11px] font-medium text-ink/60">
-            Across all platforms & formats
-          </p>
+          </div>
+          <div className="mt-1 flex items-center gap-2">
+            <span className="text-xs font-medium text-slate-500">Across all platforms & formats</span>
+          </div>
         </div>
 
-        <div className="bg-pink rounded-xl2 p-5 flex flex-col shadow-card">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-ink/10 flex items-center justify-center text-ink">
-                <TrendingUp size={16} strokeWidth={2.5} />
-              </div>
-              <p className="text-sm font-semibold text-ink/80">{activePeriod.label}</p>
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">
+              {activePeriod.label}
+            </span>
+            <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
+              <TrendingUp className="h-4 w-4 text-[#275697]" />
             </div>
-            <span className={`flex items-center text-[10px] font-bold bg-white/40 px-2 py-1 rounded-full ${earningsChangePct >= 0 ? "text-ink" : "text-red-700"}`}>
-              {earningsChangePct >= 0 ? (
-                <ArrowUpRight size={12} className="mr-0.5" />
-              ) : (
-                <ArrowDownRight size={12} className="mr-0.5" />
-              )}
+          </div>
+          <div className="mt-3 text-2xl font-black text-slate-900">
+            {formatINR(periodEarnings)}
+          </div>
+          <div className="mt-1 flex items-center gap-2">
+            <span className={`inline-flex items-center gap-0.5 text-xs font-bold ${earningsChangePct >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+              {earningsChangePct >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
               {Math.abs(earningsChangePct).toFixed(0)}%
             </span>
+            <span className="text-xs font-medium text-slate-500">
+              {periodUnits} units · vs {formatINR(prevPeriodEarnings)} prior
+            </span>
           </div>
-          <p className="text-2xl font-extrabold text-ink mb-1">
-            {formatINR(periodEarnings)}
-          </p>
-          <p className="text-[11px] font-medium text-ink/60">
-            {periodUnits} units · vs {formatINR(prevPeriodEarnings)} prior period
-          </p>
         </div>
 
-        <div className="bg-blue rounded-xl2 p-5 flex flex-col shadow-card">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-full bg-ink/10 flex items-center justify-center text-ink">
-              <Trophy size={16} strokeWidth={2.5} />
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">Top Platform</span>
+            <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
+              <Trophy className="h-4 w-4 text-[#275697]" />
             </div>
-            <p className="text-sm font-semibold text-ink/80">Top Platform</p>
           </div>
-          <p className="text-2xl font-extrabold text-ink mb-1">
+          <div className="mt-3 text-2xl font-black text-slate-900">
             {topPlatform ? topPlatform.label : "—"}
-          </p>
-          <p className="text-[11px] font-medium text-ink/60">
-            {topPlatform ? `${topPlatformShare.toFixed(0)}% of ${activePeriod.label.toLowerCase()} revenue` : "No sales in this period"}
-          </p>
+          </div>
+          <div className="mt-1 flex items-center gap-2">
+            <span className="text-xs font-medium text-slate-500">
+              {topPlatform ? `${topPlatformShare.toFixed(0)}% of ${activePeriod.label.toLowerCase()} revenue` : "No sales in this period"}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -623,14 +625,14 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
       <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-4">
 
         {/* Left Column: Revenue Trend Chart */}
-        <div className="bg-panel rounded-xl2 p-5 shadow-card flex flex-col flex-1">
+        <div className="bg-white rounded-xl2 p-5 shadow-sm flex flex-col flex-1">
           <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
-            <p className="text-sm font-bold text-ink">
+            <p className="text-sm font-bold text-slate-900">
               {selectedBook ? `Revenue: ${selectedBook}` : `Revenue Trend — ${activePeriod.label}`}
             </p>
             <button
               onClick={() => setShowCompare((v) => !v)}
-              className={`flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full transition-colors ${showCompare ? "bg-ink text-white" : "bg-ink/5 text-ink/60 hover:text-ink"
+              className={`flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full transition-colors ${showCompare ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500 hover:text-slate-900"
                 }`}
             >
               <Layers size={12} />
@@ -639,11 +641,11 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
           </div>
           {showCompare && (
             <div className="flex items-center gap-4 mb-4">
-              <span className="flex items-center gap-1.5 text-[10px] font-semibold text-ink/60">
-                <span className="w-3 h-[2px] bg-ink inline-block" /> This period
+              <span className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-500">
+                <span className="w-3 h-[2px] bg-slate-900 inline-block" /> This period
               </span>
-              <span className="flex items-center gap-1.5 text-[10px] font-semibold text-ink/60">
-                <span className="w-3 h-[2px] bg-ink/30 inline-block" style={{ borderTop: "2px dashed #17171A50" }} /> Previous period
+              <span className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-500">
+                <span className="w-3 h-[2px] bg-slate-100 inline-block" style={{ borderTop: "2px dashed #17171A50" }} /> Previous period
               </span>
             </div>
           )}
@@ -704,8 +706,8 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
         </div>
 
         {/* India Geographic Distribution (real state boundaries) */}
-        <div className="bg-panel rounded-xl2 p-5 shadow-card flex flex-col relative overflow-hidden">
-          <p className="text-sm font-bold text-ink mb-6 relative z-10">Geographic Distribution</p>
+        <div className="bg-white rounded-xl2 p-5 shadow-sm flex flex-col relative overflow-hidden">
+          <p className="text-sm font-bold text-slate-900 mb-6 relative z-10">Geographic Distribution</p>
 
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 h-full relative z-10">
 
@@ -721,20 +723,20 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
                     className={`flex flex-col gap-1.5 cursor-pointer transition-opacity duration-200 ${isDimmed ? "opacity-35" : "opacity-100"
                       }`}
                   >
-                    <div className="flex justify-between items-center text-[11px] font-bold text-ink">
+                    <div className="flex justify-between items-center text-[11px] font-bold text-slate-900">
                       <span className="flex items-center gap-1.5 truncate">
                         {i === 0 ? (
                           <Crown size={11} className="text-amber-500 shrink-0" />
                         ) : (
-                          <MapPin size={10} className="text-ink/50 shrink-0" />
+                          <MapPin size={10} className="text-slate-500 shrink-0" />
                         )}
                         <span className="truncate">{data.state}</span>
                       </span>
                       <span className="shrink-0 ml-2">{data.value} u</span>
                     </div>
-                    <div className="h-1.5 w-full bg-ink/10 rounded-full overflow-hidden">
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-ink rounded-full transition-all duration-700 ease-out"
+                        className="h-full bg-slate-900 rounded-full transition-all duration-700 ease-out"
                         style={{ width: `${(data.value / maxMapValue) * 100}%` }}
                       />
                     </div>
@@ -742,7 +744,7 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
                 );
               })}
               {rankedMapData.length === 0 && (
-                <p className="text-[11px] font-medium text-ink/40 italic">No regional sales yet for this selection.</p>
+                <p className="text-[11px] font-medium text-slate-500 italic">No regional sales yet for this selection.</p>
               )}
             </div>
 
@@ -773,20 +775,20 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
               <div className="h-9 text-center flex flex-col items-center justify-center gap-0.5 mt-1">
                 {hoveredStateInfo ? (
                   <>
-                    <p className="text-[11px] font-bold text-ink">
+                    <p className="text-[11px] font-bold text-slate-900">
                       {hoveredStateInfo.state}
                       {hoveredStateInfo.value > 0 && ` : ${hoveredStateInfo.value} u`}
                     </p>
                     {hoveredStateInfo.value > 0 && (
-                      <div className="flex items-center gap-3 text-[9px] font-medium text-ink/60">
-                        <span>Amz: <span className="text-ink font-bold">{hoveredStateInfo.amazon}</span></span>
-                        <span>Flp: <span className="text-ink font-bold">{hoveredStateInfo.flipkart}</span></span>
-                        <span>Web: <span className="text-ink font-bold">{hoveredStateInfo.website}</span></span>
+                      <div className="flex items-center gap-3 text-[9px] font-medium text-slate-500">
+                        <span>Amz: <span className="text-slate-900 font-bold">{hoveredStateInfo.amazon}</span></span>
+                        <span>Flp: <span className="text-slate-900 font-bold">{hoveredStateInfo.flipkart}</span></span>
+                        <span>Web: <span className="text-slate-900 font-bold">{hoveredStateInfo.website}</span></span>
                       </div>
                     )}
                   </>
                 ) : (
-                  <p className="text-[10px] font-medium text-ink/30 italic">Hover a state for details</p>
+                  <p className="text-[10px] font-medium text-slate-500 italic">Hover a state for details</p>
                 )}
               </div>
             </div>
@@ -797,13 +799,13 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
       {/* Lower Grid: Platform Deductions & Transactions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-        <div className="bg-panel rounded-xl2 p-5 shadow-card flex flex-col">
-          <p className="text-sm font-bold text-ink mb-3">Deductions by Platform</p>
+        <div className="bg-white rounded-xl2 p-5 shadow-sm flex flex-col">
+          <p className="text-sm font-bold text-slate-900 mb-3">Deductions by Platform</p>
 
           {/* Revenue share bar */}
           {activePlatforms.length > 0 && (
             <div className="mb-4">
-              <div className="h-2 w-full rounded-full overflow-hidden flex bg-ink/5">
+              <div className="h-2 w-full rounded-full overflow-hidden flex bg-slate-100">
                 {activePlatforms.map((p) => (
                   <div
                     key={p.key}
@@ -817,7 +819,7 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
               </div>
               <div className="flex items-center gap-3 mt-2 flex-wrap">
                 {activePlatforms.map((p) => (
-                  <span key={p.key} className="flex items-center gap-1 text-[10px] font-semibold text-ink/60">
+                  <span key={p.key} className="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
                     <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
                     {p.label} · {totalPlatformRevenue > 0 ? ((p.grossRevenue / totalPlatformRevenue) * 100).toFixed(0) : 0}%
                   </span>
@@ -829,10 +831,10 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
           <div className="flex-1 overflow-x-auto no-scrollbar">
             <table className="w-full text-left text-[12px]">
               <thead>
-                <tr className="text-ink/50 border-b border-ink/5">
+                <tr className="text-slate-500 border-b border-slate-200">
                   <th className="pb-3 font-medium">Platform</th>
                   <th className="pb-3 font-medium text-right">Gross</th>
-                  <th className="pb-3 font-medium text-right text-ink">Revenue</th>
+                  <th className="pb-3 font-medium text-right text-slate-900">Revenue</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink/5">
@@ -840,12 +842,12 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
                   <Fragment key={p.key}>
                     <tr
                       onClick={() => setExpandedPlatform(expandedPlatform === p.key ? null : p.key)}
-                      className="group hover:bg-cream/60 transition-colors cursor-pointer"
+                      className="group hover:bg-slate-50/60 transition-colors cursor-pointer"
                     >
-                      <td className="py-3 font-semibold text-ink flex items-center gap-2">
+                      <td className="py-3 font-semibold text-slate-900 flex items-center gap-2">
                         <ChevronDown
                           size={14}
-                          className={`text-ink/40 transition-transform ${expandedPlatform === p.key ? "rotate-180" : ""}`}
+                          className={`text-slate-500 transition-transform ${expandedPlatform === p.key ? "rotate-180" : ""}`}
                         />
                         <span
                           className="w-2 h-2 rounded-full"
@@ -853,20 +855,20 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
                         />
                         <div className="flex flex-col">
                           <span>{p.label}</span>
-                          <span className="text-[10px] text-ink/50 font-medium">{p.units} units</span>
+                          <span className="text-[10px] text-slate-500 font-medium">{p.units} units</span>
                         </div>
                       </td>
-                      <td className="py-3 text-right font-medium text-ink/70">
+                      <td className="py-3 text-right font-medium text-slate-500">
                         {formatINR(p.grossRevenue)}
                       </td>
 
-                      <td className="py-3 text-right font-bold text-ink">
+                      <td className="py-3 text-right font-bold text-slate-900">
                         {formatINR(p.grossRevenue)}
                       </td>
                     </tr>
                     {expandedPlatform === p.key && (
                       <tr>
-                        <td colSpan={4} className="p-0 border-b border-ink/5 bg-cream/50">
+                        <td colSpan={4} className="p-0 border-b border-slate-200 bg-slate-50/50">
                           <div className="p-4 pl-8 text-[11px]">
                             {(() => {
                               const pTxns = filteredTxns.filter((t: any) => t.platform === p.label);
@@ -876,14 +878,14 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
                               });
                               const entries = Array.from(grouped.entries()).sort((a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime());
 
-                              if (entries.length === 0) return <p className="text-ink/50 italic">No sales data.</p>;
+                              if (entries.length === 0) return <p className="text-slate-500 italic">No sales data.</p>;
                               return (
                                 <table className="w-full text-left">
                                   <tbody>
                                     {entries.map(([date, count]) => (
-                                      <tr key={date} className="border-b border-ink/5 last:border-0">
-                                        <td className="py-1.5 font-medium text-ink/70">{formatDisplayDate(date)}</td>
-                                        <td className="py-1.5 text-right font-bold text-ink/80">{count} {count === 1 ? 'book' : 'books'} sold</td>
+                                      <tr key={date} className="border-b border-slate-200 last:border-0">
+                                        <td className="py-1.5 font-medium text-slate-500">{formatDisplayDate(date)}</td>
+                                        <td className="py-1.5 text-right font-bold text-slate-500">{count} {count === 1 ? 'book' : 'books'} sold</td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -898,7 +900,7 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
                 ))}
                 {activePlatforms.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-6 text-center text-ink/50">No sales on platforms for this selection.</td>
+                    <td colSpan={4} className="py-6 text-center text-slate-500">No sales on platforms for this selection.</td>
                   </tr>
                 )}
               </tbody>
@@ -906,12 +908,12 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
           </div>
         </div>
 
-        <div className="bg-panel rounded-xl2 p-5 shadow-card flex flex-col">
+        <div className="bg-white rounded-xl2 p-5 shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-            <p className="text-sm font-bold text-ink">Recent Transactions</p>
+            <p className="text-sm font-bold text-slate-900">Recent Transactions</p>
             <button
               onClick={() => setTxnSort(txnSort === "recent" ? "earnings" : "recent")}
-              className="flex items-center gap-1.5 text-[11px] font-semibold text-ink/60 hover:text-ink transition-colors"
+              className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 hover:text-slate-900 transition-colors"
             >
               <ArrowUpDown size={12} />
               {txnSort === "recent" ? "Most recent" : "Top earning"}
@@ -919,17 +921,17 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
           </div>
 
           <div className="relative mb-3">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/40" />
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               value={txnQuery}
               onChange={(e) => setTxnQuery(e.target.value)}
               placeholder="Search by book or platform"
-              className="w-full text-[12px] font-medium text-ink bg-cream rounded-lg pl-8 pr-8 py-2 outline-none placeholder:text-ink/40"
+              className="w-full text-[12px] font-medium text-slate-900 bg-slate-50 rounded-lg pl-8 pr-8 py-2 outline-none placeholder:text-slate-500"
             />
             {txnQuery && (
               <button
                 onClick={() => setTxnQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink/40 hover:text-ink"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-900"
                 aria-label="Clear search"
               >
                 <X size={13} />
@@ -939,37 +941,37 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
 
           <div className="overflow-x-auto no-scrollbar max-h-[300px]">
             <table className="w-full text-left text-[12px]">
-              <thead className="sticky top-0 bg-panel z-10">
-                <tr className="text-ink/50 border-b border-ink/5">
+              <thead className="sticky top-0 bg-white z-10">
+                <tr className="text-slate-500 border-b border-slate-200">
                   <th className="pb-3 font-medium">Date</th>
                   <th className="pb-3 font-medium">Title & Platform</th>
                   <th className="pb-3 font-medium text-center">Qty</th>
-                  <th className="pb-3 font-medium text-right text-ink">Earned</th>
+                  <th className="pb-3 font-medium text-right text-slate-900">Earned</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink/5">
                 {visibleTxns.slice(0, 15).map((t: any) => (
-                  <tr key={t.id} className="hover:bg-cream transition-colors group">
-                    <td className="py-2.5 font-medium text-ink/70 whitespace-nowrap">
+                  <tr key={t.id} className="hover:bg-slate-50 transition-colors group">
+                    <td className="py-2.5 font-medium text-slate-500 whitespace-nowrap">
                       {formatDisplayDate(t.date).replace("Today · ", "")}
                     </td>
                     <td className="py-2.5">
-                      <p className="font-semibold text-ink truncate max-w-[150px]">{t.bookTitle}</p>
-                      <p className="text-[10px] text-ink/50">
+                      <p className="font-semibold text-slate-900 truncate max-w-[150px]">{t.bookTitle}</p>
+                      <p className="text-[10px] text-slate-500">
                         {t.platform}{t.format ? ` · ${t.format}` : ""}
                       </p>
                     </td>
-                    <td className="py-2.5 text-center font-medium text-ink/70">
+                    <td className="py-2.5 text-center font-medium text-slate-500">
                       {t.units}
                     </td>
-                    <td className="py-2.5 text-right font-bold text-ink">
+                    <td className="py-2.5 text-right font-bold text-slate-900">
                       {formatINR(t.gross)}
                     </td>
                   </tr>
                 ))}
                 {visibleTxns.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-6 text-center text-ink/50">
+                    <td colSpan={4} className="py-6 text-center text-slate-500">
                       {txnQuery ? `No transactions match "${txnQuery}".` : "No recent transactions."}
                     </td>
                   </tr>
@@ -978,7 +980,7 @@ export default function SalesPage({ initialData }: { initialData?: any; storeUrl
             </table>
           </div>
           {visibleTxns.length > 15 && (
-            <p className="text-[10px] font-medium text-ink/40 mt-2 text-right">
+            <p className="text-[10px] font-medium text-slate-500 mt-2 text-right">
               Showing 15 of {visibleTxns.length}
             </p>
           )}
