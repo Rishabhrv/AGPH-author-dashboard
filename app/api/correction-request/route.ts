@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
   if (!bookId || !section) {
     return NextResponse.json({ success: false, message: "Missing bookId or section" }, { status: 400 });
   }
+  
 
   const token = cookies().get("auth_token")?.value;
   if (!token) {
