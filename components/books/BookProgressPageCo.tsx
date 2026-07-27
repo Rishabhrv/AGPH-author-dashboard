@@ -542,6 +542,10 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
   const API_URL = process.env.API_URL || "http://localhost:5001";
 
 
+
+  
+
+
   const handleApprove = async (approvalType: string) => {
     setIsApproving(true);
     try {
