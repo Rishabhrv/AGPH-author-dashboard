@@ -21,24 +21,24 @@ import {
   FileText,
   Library,
   IndianRupee,
+  LayoutDashboard,
 } from "lucide-react";
 
 // --- Navigation Data ---
 const generalNav = [
+  { label: "Overview", href: "/", icon: "dashboard" },
   { label: "Sales", href: "/sales", icon: "sales" },
   { label: "Book Progress", href: "/books", icon: "books" },
-  { label: "Community", href: "/community", icon: "community" },
   { label: "Ratings & Reviews", href: "/reviews", icon: "reviews" },
   { label: "Royalty", href: "/royalty", icon: "royalty" },
 ];
 
-
 const toolsNav = [
-  { label: "Support", href: "/support", icon: "support" },
   { label: "Author Profile", href: "/profile", icon: "profile" },
 ];
 
 const icons: Record<string, React.ElementType> = {
+  dashboard: LayoutDashboard,
   sales: TrendingUp,
   audience: Users,
   books: BookOpen,
@@ -65,23 +65,26 @@ export default function Sidebar({ active }: { active: string }) {
 
   return (
     <aside
-      className={`sticky top-5 h-[calc(100vh-40px)] hidden lg:flex flex-col shrink-0 bg-gradient-to-r from-ink to-ink/90  rounded-[22px] py-5 transition-all duration-300 ease-in-out ${isCollapsed ? "w-[75px] px-3" : "w-[240px] px-4"
-        }`}
+      className={`sticky top-5 h-[calc(100vh-40px)] hidden lg:flex flex-col shrink-0 bg-white border border-slate-200 rounded-[22px] py-5 shadow-sm transition-all duration-300 ease-in-out ${
+        isCollapsed ? "w-[75px] px-3" : "w-[240px] px-4"
+      }`}
     >
       {/* Header / Logo */}
       <div
-        className={`flex items-center mb-8 h-7 ${isCollapsed ? "justify-center" : "justify-between px-1"
-          }`}
+        className={`flex items-center mb-8 h-7 ${
+          isCollapsed ? "justify-center" : "justify-between px-1"
+        }`}
       >
         {!isCollapsed && (
-          <Link href="/" className="text-white text-xl font-extrabold tracking-tight whitespace-nowrap">
+          <Link href="/" className="text-slate-900 text-xl font-extrabold tracking-tight whitespace-nowrap flex items-center gap-2">
+            <span className="bg-slate-900 text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm">AG</span>
             AGPH
           </Link>
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="w-7 h-7 rounded-full bg-pink flex items-center justify-center text-ink shrink-0 transition-transform hover:scale-105"
+          className="w-7 h-7 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800 shrink-0 transition-colors"
         >
           {isCollapsed ? (
             <ChevronRight size={14} strokeWidth={2.5} />
@@ -96,11 +99,11 @@ export default function Sidebar({ active }: { active: string }) {
         {/* Section 1: General Dashboard */}
         <div>
           {!isCollapsed && (
-            <p className="px-3 text-[11px] font-semibold tracking-wide text-white/35 uppercase mb-2 whitespace-nowrap">
+            <p className="px-3 text-[11px] font-bold tracking-wider text-slate-400 uppercase mb-2 whitespace-nowrap">
               Dashboard
             </p>
           )}
-          <ul className="flex flex-col gap-0.5">
+          <ul className="flex flex-col gap-1">
             {generalNav.map((item) => (
               <NavRow
                 key={item.label}
@@ -112,15 +115,14 @@ export default function Sidebar({ active }: { active: string }) {
           </ul>
         </div>
 
-
         {/* Section 3: Account Tools */}
         <div>
           {!isCollapsed && (
-            <p className="px-3 text-[11px] font-semibold tracking-wide text-white/35 uppercase mb-2 whitespace-nowrap">
+            <p className="px-3 text-[11px] font-bold tracking-wider text-slate-400 uppercase mb-2 whitespace-nowrap">
               Account Tools
             </p>
           )}
-          <ul className="flex flex-col gap-0.5">
+          <ul className="flex flex-col gap-1">
             {toolsNav.map((item) => (
               <NavRow
                 key={item.label}
@@ -134,11 +136,12 @@ export default function Sidebar({ active }: { active: string }) {
       </nav>
 
       {/* Footer / Logout */}
-      <div className="pt-4 mt-auto">
+      <div className="pt-4 mt-auto border-t border-slate-100">
         <button
           onClick={handleLogout}
-          className={`w-full flex items-center py-2.5 text-white/60 text-sm font-medium hover:text-white transition-colors ${isCollapsed ? "justify-center px-0" : "gap-3 px-3"
-            }`}
+          className={`w-full flex items-center py-2.5 text-slate-500 text-sm font-medium hover:text-slate-800 transition-colors ${
+            isCollapsed ? "justify-center px-0" : "gap-3 px-3"
+          }`}
           title={isCollapsed ? "Log out" : undefined}
         >
           <LogOut size={17} strokeWidth={2} className="shrink-0" />
@@ -160,7 +163,7 @@ function NavRow({
 }) {
   const Icon = icons[item.icon] ?? TrendingUp;
 
-  // Smaarter matching: checks if 'active' matches the route href OR the icon name
+  // Smarter matching: checks if 'active' matches the route href OR the icon name
   const isActive = item.href === active || item.icon === active || item.label === active;
 
   return (
@@ -168,19 +171,21 @@ function NavRow({
       <a
         href={item.href}
         title={isCollapsed ? item.label : undefined}
-        className={`relative flex items-center py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isCollapsed ? "justify-center " : "gap-3 px-3"
-          } ${isActive
-            ? "bg-white/[0.07] text-white"
-            : "text-white/50 hover:bg-white/[0.03] hover:text-white/80"
-          }`}
+        className={`relative flex items-center py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+          isCollapsed ? "justify-center " : "gap-3 px-3"
+        } ${
+          isActive
+            ? "bg-sky-50 text-[#275697]"
+            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+        }`}
       >
         {isActive && (
-          <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-[3px] rounded-full bg-pink transition-all duration-300" />
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-md bg-[#275697] transition-all duration-300" />
         )}
         <Icon
-          size={17}
-          strokeWidth={2}
-          className={`shrink-0 ${isActive ? "text-pink" : ""}`}
+          size={18}
+          strokeWidth={isActive ? 2.5 : 2}
+          className={`shrink-0 ${isActive ? "text-[#275697]" : "text-slate-400"}`}
         />
         {!isCollapsed && (
           <span className="truncate whitespace-nowrap transition-opacity duration-300">

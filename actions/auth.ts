@@ -1,6 +1,12 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+export async function logoutAction() {
+  cookies().delete("auth_token");
+  redirect("/login");
+}
 
 export async function loginAction(prevState: any, formData: FormData) {
   const username = formData.get("username") as string;
@@ -80,9 +86,6 @@ export async function getAuthorDetails() {
   }
 }
 
-export async function logoutAction() {
-  cookies().delete("auth_token");
-}
 
 export async function getAuthorProfileData() {
   const token = cookies().get("auth_token")?.value;
@@ -262,3 +265,100 @@ export async function getAuthorReviewsData() {
       return null;
     }
   }
+
+export async function submitAuthorOnboarding(formData: FormData) {
+  const token = cookies().get("auth_token")?.value;
+  if (!token) return { success: false, message: "Unauthorized" };
+
+  const apiUrl = process.env.API_URL || "http://localhost:5001";
+  try {
+    const res = await fetch(`${apiUrl}/api/author/onboarding`, {
+      method: "POST",
+      headers: { 
+        "Authorization": `Bearer ${token}`
+      },
+      body: formData
+    });
+    
+    if (!res.ok) {
+      return { success: false, message: "Failed to submit onboarding" };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (e) {
+    console.error("Onboarding upload error:", e);
+    return { success: false, message: "Network error" };
+  }
+}
+
+export async function getAuthorBadges() {
+  const token = cookies().get("auth_token")?.value;
+  if (!token) return null;
+
+  const apiUrl = process.env.API_URL || "http://localhost:5001";
+  try {
+    const res = await fetch(`${apiUrl}/api/author/badges`, {
+      method: "GET",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      cache: "no-store"
+    });
+    
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.success ? data.data : null;
+  } catch (e) {
+    console.error("Badges fetch error:", e);
+    return null;
+  }
+}
+
+export async function syncAuthorBadges(badgeData: any) {
+  const token = cookies().get("auth_token")?.value;
+  if (!token) return { success: false };
+
+  const apiUrl = process.env.API_URL || "http://localhost:5001";
+  try {
+    const res = await fetch(`${apiUrl}/api/author/badges/sync`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(badgeData)
+    });
+    
+    const data = await res.json();
+    return data;
+  } catch (e) {
+    console.error("Badges sync error:", e);
+    return { success: false };
+  }
+}
+
+export async function getAuthorLeaderboard() {
+  const token = cookies().get("auth_token")?.value;
+  if (!token) return null;
+
+  const apiUrl = process.env.API_URL || "http://localhost:5001";
+  try {
+    const res = await fetch(`${apiUrl}/api/author/leaderboard`, {
+      method: "GET",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      cache: "no-store"
+    });
+    
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.success ? data.data : null;
+  } catch (e) {
+    console.error("Leaderboard fetch error:", e);
+    return null;
+  }
+}
