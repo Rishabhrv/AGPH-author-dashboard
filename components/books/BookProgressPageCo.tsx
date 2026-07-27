@@ -24,7 +24,7 @@ type Stage = typeof ALL_STAGES[number];
 type StepStatus = "Not Started" | "In Progress" | "Action Needed" | "Completed";
 
 type EnrichedStep = {
-  stage: Stage;
+  stage: string;
   status: StepStatus;
   note: string;
   icon: React.ElementType;
@@ -72,6 +72,8 @@ type EnrichedBook = {
   // Raw backend fields
   isbn?: string;
   syllabus_path?: string;
+  manuscript_path?: string;
+  print_status?: number;
   writing_start?: string;
   writing_end?: string;
   cover_pdf_link?: string;
@@ -81,6 +83,8 @@ type EnrichedBook = {
   agph_link?: string;
   flipkart_link?: string;
   google_link?: string;
+  is_thesis_to_book?: boolean | number;
+  is_publish_only?: boolean | number;
   corrections: Correction[];
   approvals: string[];
 };
@@ -95,12 +99,17 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
   // 1. Content Received (shown for all books)
   {
     let status: StepStatus = "Not Started";
-    let note = "Waiting for syllabus or manuscript.";
-    if (book.syllabus_path) {
+    let typeName = "Syllabus";
+    if (book.is_thesis_to_book) typeName = "Thesis";
+    else if (book.is_publish_only) typeName = "Content";
+
+    let note = `Waiting for ${typeName.toLowerCase()} upload.`;
+    const hasContent = (book.is_thesis_to_book || book.is_publish_only) ? book.manuscript_path : book.syllabus_path;
+    if (hasContent) {
       status = "Completed";
-      note = "Content uploaded successfully.";
+      note = `${typeName} uploaded successfully.`;
     }
-    steps.push({ stage: "Content Received", status, note, icon: STAGE_ICONS["Content Received"] });
+    steps.push({ stage: `${typeName} Received`, status, note, icon: STAGE_ICONS["Content Received"] });
   }
 
   // 2. ISBN Assigned
@@ -110,8 +119,8 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
     steps.push({ stage: "ISBN Assigned", status, note, icon: STAGE_ICONS["ISBN Assigned"] });
   }
 
-  // 3. Writing (Only for agph_written)
-  if (intakePath === "agph_written") {
+  // 3. Writing (Only for agph_written, hidden for thesis/publish only)
+  if (intakePath === "agph_written" && !book.is_thesis_to_book && !book.is_publish_only) {
     let status: StepStatus = "Not Started";
     let note = "Waiting for writers to start.";
 
@@ -176,10 +185,10 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
   {
     let status: StepStatus = "Not Started";
     let note = "Pending print approval.";
-    if (book.delivery_date) {
+    if (book.print_status === 1) {
       status = "Completed";
       note = "Printing finished.";
-    } else if (approvals.includes("digital_proof")) {
+    } else if (book.print_status === 0 && approvals.includes("digital_proof")) {
       status = "In Progress";
       note = "Currently at the printing press.";
     }
@@ -406,6 +415,10 @@ function BookCard({
         <div className="flex-1 min-w-0 pr-4">
           <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
             <h3 className="text-[17px] font-extrabold text-slate-900 truncate group-hover:text-amber-600 transition-colors">{book.title}</h3>
+            <span className="flex items-center gap-1 text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200 px-2 py-0.5 rounded-full shrink-0 shadow-sm">
+              <BookOpen size={10} />
+              {book.is_thesis_to_book ? "Thesis to Book" : book.is_publish_only ? "Publish Only Book" : "Normal Book"}
+            </span>
             {book.needsAction && (
               <span className="flex items-center gap-1 text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full shrink-0 shadow-sm">
                 <AlertTriangle size={10} /> Action Needed
@@ -526,7 +539,8 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [showCorrectionModal, setShowCorrectionModal] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
-  const API_URL = "http://localhost:5001";
+  const API_URL = process.env.API_URL || "http://localhost:5001";
+
 
   const handleApprove = async (approvalType: string) => {
     setIsApproving(true);
@@ -549,16 +563,55 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
   };
 
   // Content Received
-  if (step.stage === "Content Received" && book.syllabus_path) {
-    const syllabusUrl = book.syllabus_path.startsWith("http")
-      ? book.syllabus_path
-      : `${API_URL}${book.syllabus_path.startsWith('/') ? '' : '/'}${book.syllabus_path}`;
+  if (step.stage.endsWith("Received")) {
+    const hasContent = (book.is_thesis_to_book || book.is_publish_only) ? book.manuscript_path : book.syllabus_path;
+    
+    if (hasContent) {
+      const contentUrl = hasContent.startsWith("http")
+        ? hasContent
+        : `${API_URL}${hasContent.startsWith('/') ? '' : '/'}${hasContent}`;
 
-    return (
-      <a href={syllabusUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 w-full bg-white/60 hover:bg-white text-slate-500 hover:text-slate-900 border border-slate-200 text-[11px] font-bold py-2 rounded-xl transition-all">
-        <FileText size={13} /> View Content <ExternalLink size={11} />
-      </a>
-    );
+      return (
+        <a href={contentUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 w-full bg-white/60 hover:bg-white text-slate-500 hover:text-slate-900 border border-slate-200 text-[11px] font-bold py-2 rounded-xl transition-all">
+          <FileText size={13} /> View Content <ExternalLink size={11} />
+        </a>
+      );
+    } else {
+      return (
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center justify-center gap-1.5 w-full bg-blue-600 text-white hover:bg-blue-700 shadow-sm text-[11px] font-bold py-2 rounded-xl transition-all cursor-pointer">
+            <Upload size={13} /> Upload Content
+            <input 
+              type="file" 
+              className="hidden" 
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("book_id", book.book_id.toString());
+                
+                try {
+                  const res = await fetch("/api/upload-content", {
+                    method: "POST",
+                    body: formData,
+                  });
+                  if (res.ok) {
+                    window.location.reload();
+                  } else {
+                    const data = await res.json();
+                    alert(data.message || "Failed to upload content.");
+                  }
+                } catch {
+                  alert("Network error.");
+                }
+              }} 
+            />
+          </label>
+        </div>
+      );
+    }
   }
 
   // Cover Design
@@ -579,7 +632,7 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
               <Printer size={13} /> {isApproving ? "..." : "Approve"}
             </button>
             <button onClick={() => setShowCorrectionModal(true)} disabled={!book.cover_pdf_link} className="flex-1 flex items-center justify-center gap-1.5 bg-white border border-amber-300 text-amber-700 hover:bg-amber-50 text-[11px] font-bold py-2 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-              <RotateCcw size={13} /> Change
+              <RotateCcw size={13} /> Correction
             </button>
           </div>
         )}
@@ -603,7 +656,7 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
               <Printer size={13} /> {isApproving ? "..." : "Approve"}
             </button>
             <button onClick={() => setShowCorrectionModal(true)} className="flex-1 flex items-center justify-center gap-1.5 bg-white border border-amber-300 text-amber-700 hover:bg-amber-50 text-[11px] font-bold py-2 rounded-xl transition-all">
-              <RotateCcw size={13} /> Change
+              <RotateCcw size={13} /> Correction
             </button>
           </div>
         )}

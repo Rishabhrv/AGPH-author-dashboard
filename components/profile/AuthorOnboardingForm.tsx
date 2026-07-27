@@ -27,7 +27,6 @@ export default function AuthorOnboardingForm({ onComplete, onSkip }: Props) {
     address: "",
     idNumber: "",
     bio: "",
-    copies: "",
   });
 
   // Files
@@ -74,7 +73,6 @@ export default function AuthorOnboardingForm({ onComplete, onSkip }: Props) {
       if (!formData.idNumber.trim()) newErrors.idNumber = true;
     } else if (step === 3) {
       if (!formData.bio.trim()) newErrors.bio = true;
-      if (!formData.copies || parseInt(formData.copies) < 1) newErrors.copies = true;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -99,7 +97,11 @@ export default function AuthorOnboardingForm({ onComplete, onSkip }: Props) {
 
     const formDataToSend = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      formDataToSend.append(key, value);
+      let backendKey = key;
+      if (key === "fullName") backendKey = "full_name";
+      if (key === "address") backendKey = "full_address";
+      if (key === "idNumber") backendKey = "id_proof_number";
+      formDataToSend.append(backendKey, value);
     });
     if (photo) formDataToSend.append("photo", photo);
     if (idProof) formDataToSend.append("id_proof", idProof);
@@ -330,15 +332,6 @@ export default function AuthorOnboardingForm({ onComplete, onSkip }: Props) {
                   <p className="text-xs text-slate-400 mt-1.5 font-medium">This will be printed on your book covers and author page.</p>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Agreed Book Copies</label>
-                  <div className="relative">
-                    <input type="number" name="copies" value={formData.copies} onChange={handleChange} 
-                      className={`w-full px-4 py-3 bg-white border ${errors.copies ? "border-rose-300 ring-rose-100" : "border-slate-200 hover:border-slate-300 focus:border-indigo-500"} rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all`} 
-                      placeholder="0" min="1" />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium pointer-events-none">Copies</div>
-                  </div>
-                </div>
               </div>
 
               <div className="pt-4 flex items-center justify-between border-t border-slate-100">
@@ -372,9 +365,6 @@ export default function AuthorOnboardingForm({ onComplete, onSkip }: Props) {
                   <div className="font-semibold text-emerald-600 text-right flex items-center justify-end gap-1.5">
                     <CheckCircle2 size={16} className="text-emerald-500" /> Uploaded
                   </div>
-                  
-                  <div className="text-slate-500 font-medium">Agreed Copies</div>
-                  <div className="font-semibold text-slate-800 text-right">{formData.copies}</div>
                 </div>
               </div>
 

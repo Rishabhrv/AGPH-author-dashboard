@@ -19,7 +19,9 @@ const PLATFORM_COLORS: Record<string, string> = {
   "AGPH Website": "#34A853",
 };
 
-export default function ReviewsPageCo({ initialData, storeUrl = "http://localhost:5000" }: { initialData?: any; storeUrl?: string }) {
+
+
+export default function ReviewsPageCo({ initialData, storeUrl }: { initialData?: any; storeUrl?: string }) {
   const allReviews = useMemo(() => initialData?.reviews || [], [initialData]);
   const booksData = useMemo(() => initialData?.books || [], [initialData]);
 

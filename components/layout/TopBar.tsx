@@ -8,7 +8,7 @@ import { logoutAction, getAuthorProfileData, getAuthorBadges } from "@/actions/a
 import { searchDashboard, SearchResult } from "@/actions/search";
 import BadgeSystemCo, { TIERS } from "../profile/BadgeSystemCo";
 
-export const searchFilters = ["Sales", "Reviews", "Community"];
+export const searchFilters = ["Sales", "Reviews"];
 
 
 export default function TopBar() {
