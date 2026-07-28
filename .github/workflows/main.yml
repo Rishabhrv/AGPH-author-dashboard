@@ -1,0 +1,52 @@
+name: Deploy Author Dashboard
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 178.16.137.226
+          username: rishabhvyas
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 600s
+          script: |
+            # set -e makes the script exit immediately if any command returns a non-zero status
+            set -e
+            # Navigate to the app folder
+            cd /home/rishabhvyas/AGPH-author-dashboard
+
+            # 1. Clear any local file modifications (fixes the package-lock.json error)
+            git reset --hard
+
+            # 2. Pull the latest code
+            git pull origin main
+
+            # 3. Initialize NVM for Node 24
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm use 24.2.0
+
+            # 4. Install dependencies
+            npm install
+
+            # 5. Apply any pending Prisma migrations
+            npx prisma migrate deploy
+
+            # 6. Generate Prisma client (in case schema changed)
+            npx prisma generate
+
+            # 7. Build the app
+            npm run build
+
+            # 8. Restart the PM2 process
+            # We use --update-env in case you changed any .env variables
+            PORT=3010 pm2 restart author-dashboard --update-env || PORT=3010 pm2 start npm --name "author-dashboard" -- start
+
+            echo "✅ Author Dashboard Deployment Successful!"
