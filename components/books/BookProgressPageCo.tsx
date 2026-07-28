@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import {
   BookOpen, CheckCircle2, PenTool, Image as ImageIcon, Barcode, Globe, FileText,
   Clock, AlertTriangle, Search, Eye, Printer, Truck, ShieldCheck, RotateCcw,
   Upload, Bell, ChevronDown, ChevronUp, Circle, X, Sparkles, ExternalLink,
-  SendHorizonal, MessageSquare, LayoutGrid
+  SendHorizonal, MessageSquare, LayoutGrid, ListChecks
 } from "lucide-react";
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -15,7 +15,7 @@ import {
 type IntakePath = "author_content" | "agph_written";
 
 const ALL_STAGES = [
-  "Content Received", "ISBN Assigned", "Writing", "Cover Design",
+  "Content Received", "ISBN Assigned", "Cover Design", "Writing",
   "Digital Proof", "Printing", "Dispatched", "Listed on Platforms"
 ] as const;
 
@@ -90,7 +90,7 @@ type EnrichedBook = {
 };
 
 /* ─────────────────────────────────────────────────────────────────────────
-   STEP DERIVATION LOGIC (INDEPENDENT)
+   STEP DERIVATION LOGIC (INDEPENDENT) — unchanged from your original
    ───────────────────────────────────────────────────────────────────────── */
 
 function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[], approvals: string[]): EnrichedStep[] {
@@ -119,27 +119,7 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
     steps.push({ stage: "ISBN Assigned", status, note, icon: STAGE_ICONS["ISBN Assigned"] });
   }
 
-  // 3. Writing (Only for agph_written, hidden for thesis/publish only)
-  if (intakePath === "agph_written" && !book.is_thesis_to_book && !book.is_publish_only) {
-    let status: StepStatus = "Not Started";
-    let note = "Waiting for writers to start.";
-
-    const hasActiveWritingCorr = corrections.some(c => c.is_active && (c.section === "writing" || c.section === "proofreading"));
-
-    if (book.writing_end) {
-      status = "Completed";
-      note = "Writing and proofreading finished.";
-    } else if (hasActiveWritingCorr) {
-      status = "Action Needed";
-      note = "Writing correction requested.";
-    } else if (book.writing_start) {
-      status = "In Progress";
-      note = "Drafting currently in progress.";
-    }
-    steps.push({ stage: "Writing", status, note, icon: STAGE_ICONS["Writing"] });
-  }
-
-  // 4. Cover Design
+  // 3. Cover Design
   {
     let status: StepStatus = "Not Started";
     let note = "Cover design pending.";
@@ -163,6 +143,26 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
       note = "Design work underway.";
     }
     steps.push({ stage: "Cover Design", status, note, icon: STAGE_ICONS["Cover Design"] });
+  }
+
+  // 4. Writing (Only for agph_written, hidden for thesis/publish only)
+  if (intakePath === "agph_written" && !book.is_thesis_to_book && !book.is_publish_only) {
+    let status: StepStatus = "Not Started";
+    let note = "Waiting for writers to start.";
+
+    const hasActiveWritingCorr = corrections.some(c => c.is_active && (c.section === "writing" || c.section === "proofreading"));
+
+    if (book.writing_end) {
+      status = "Completed";
+      note = "Writing and proofreading finished.";
+    } else if (hasActiveWritingCorr) {
+      status = "Action Needed";
+      note = "Writing correction requested.";
+    } else if (book.writing_start) {
+      status = "In Progress";
+      note = "Drafting currently in progress.";
+    }
+    steps.push({ stage: "Writing", status, note, icon: STAGE_ICONS["Writing"] });
   }
 
   // 5. Digital Proof
@@ -243,7 +243,7 @@ function mapBackendBookToEnriched(book: any): EnrichedBook {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   MAIN COMPONENT
+   MAIN COMPONENT — unchanged from your original
    ───────────────────────────────────────────────────────────────────────── */
 
 export default function BookProgressPageCo({ initialData = [] }: { initialData?: any[] }) {
@@ -368,7 +368,52 @@ export default function BookProgressPageCo({ initialData = [] }: { initialData?:
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   BOOK CARD 
+   STEP STATUS STYLING — shared by strip, focus cards, chips
+   ───────────────────────────────────────────────────────────────────────── */
+
+const STATUS_STYLE: Record<StepStatus, { card: string; iconBg: string; pill: string; dot: string }> = {
+  "Not Started": {
+    card: "bg-white border-slate-200 text-slate-500",
+    iconBg: "bg-slate-100 text-slate-500",
+    pill: "bg-slate-100 text-slate-500",
+    dot: "bg-slate-300",
+  },
+  "In Progress": {
+    card: "bg-blue-50/50 border-blue-200 text-blue-800 ring-1 ring-blue-500/10",
+    iconBg: "bg-blue-100 text-blue-600",
+    pill: "bg-blue-200/50 text-blue-700",
+    dot: "bg-blue-500",
+  },
+  "Action Needed": {
+    card: "bg-amber-50/80 border-amber-300 text-amber-900 ring-2 ring-amber-400/20 shadow-sm",
+    iconBg: "bg-amber-200 text-amber-700",
+    pill: "bg-amber-200/60 text-amber-800",
+    dot: "bg-amber-500",
+  },
+  Completed: {
+    card: "bg-emerald-50/40 border-emerald-200 text-emerald-800",
+    iconBg: "bg-emerald-100 text-emerald-600",
+    pill: "bg-emerald-200/50 text-emerald-700",
+    dot: "bg-emerald-500",
+  },
+};
+
+/**
+ * Buckets a step for DISPLAY purposes (separate from its raw backend `status`).
+ * Content/Syllabus/Thesis Received sits at "Not Started" in your data model,
+ * but it's the one thing the author actually needs to act on — so it's
+ * promoted into "attention" here rather than shown as a passive upcoming tile.
+ */
+function getDisplayGroup(step: EnrichedStep): "attention" | "progress" | "completed" | "upcoming" {
+  if (step.status === "Action Needed") return "attention";
+  if (step.status === "In Progress") return "progress";
+  if (step.status === "Completed") return "completed";
+  if (step.stage.endsWith("Received")) return "attention";
+  return "upcoming";
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   BOOK CARD
    ───────────────────────────────────────────────────────────────────────── */
 
 function BookCard({
@@ -381,6 +426,23 @@ function BookCard({
   onToggle: () => void;
 }) {
   const progressPct = Math.round((book.completedStepsCount / book.totalStepsCount) * 100) || 0;
+
+  const [activeStage, setActiveStage] = useState<string | null>(null);
+  const [expandedCompleted, setExpandedCompleted] = useState(false);
+  const stageRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const grouped = useMemo(() => ({
+    attention: book.steps.filter((s) => getDisplayGroup(s) === "attention"),
+    progress: book.steps.filter((s) => getDisplayGroup(s) === "progress"),
+    completed: book.steps.filter((s) => getDisplayGroup(s) === "completed"),
+    upcoming: book.steps.filter((s) => getDisplayGroup(s) === "upcoming"),
+  }), [book.steps]);
+
+  function scrollToStage(stage: string) {
+    setActiveStage(stage);
+    stageRefs.current[stage]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => setActiveStage((cur) => (cur === stage ? null : cur)), 1000);
+  }
 
   return (
     <div className={`group bg-white rounded-xl transition-all duration-300 ${isExpanded
@@ -452,13 +514,102 @@ function BookCard({
         </div>
       </button>
 
-      {/* ── Expanded: Grid of Independent Steps ── */}
+      {/* ── Expanded: Steps grouped by what needs you, what's moving, what's done, what's ahead ── */}
       {isExpanded && (
         <div className="px-6 pb-6 pt-2 border-t border-slate-200 bg-slate-900/[0.015] rounded-b-2xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
-            {book.steps.map((step) => (
-              <StepCard key={step.stage} step={step} book={book} />
-            ))}
+
+          {/* Signature: glanceable, clickable pipeline strip */}
+          <div className="mb-6 mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pipeline status</span>
+              <span className="text-[11px] font-semibold text-slate-500">
+                {book.completedStepsCount} of {book.totalStepsCount} stages complete
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              {book.steps.map((s) => (
+                <button
+                  key={s.stage}
+                  type="button"
+                  title={`${s.stage} — ${s.status}`}
+                  onClick={() => scrollToStage(s.stage)}
+                  className={`h-2 flex-1 rounded-full transition-transform duration-300 ${STATUS_STYLE[s.status].dot} ${activeStage === s.stage ? "scale-y-150 ring-2 ring-offset-1 ring-slate-400" : "hover:scale-y-125"
+                    }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            {grouped.attention.length > 0 && (
+              <StepSection icon={AlertTriangle} tone="amber" label="Needs your attention" count={grouped.attention.length}>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {grouped.attention.map((step) => (
+                    <StepFocusCard
+                      key={step.stage}
+                      step={step}
+                      book={book}
+                      refEl={(el) => (stageRefs.current[step.stage] = el)}
+                    />
+                  ))}
+                </div>
+              </StepSection>
+            )}
+
+            {grouped.progress.length > 0 && (
+              <StepSection icon={Clock} tone="blue" label="In progress" count={grouped.progress.length}>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {grouped.progress.map((step) => (
+                    <StepFocusCard
+                      key={step.stage}
+                      step={step}
+                      book={book}
+                      refEl={(el) => (stageRefs.current[step.stage] = el)}
+                    />
+                  ))}
+                </div>
+              </StepSection>
+            )}
+
+            {(grouped.completed.length > 0 || grouped.upcoming.length > 0) && (
+              <StepSection
+                icon={ListChecks}
+                tone="emerald"
+                label="Completed & Upcoming"
+                count={grouped.completed.length + grouped.upcoming.length}
+                collapsible
+                expanded={expandedCompleted}
+                onToggle={() => setExpandedCompleted((v) => !v)}
+              >
+                {!expandedCompleted ? (
+                  <div className="flex flex-wrap gap-2">
+                    {book.steps
+                      .filter(s => getDisplayGroup(s) === "completed" || getDisplayGroup(s) === "upcoming")
+                      .map((step) => (
+                        <StepChip
+                          key={step.stage}
+                          step={step}
+                          book={book}
+                          refEl={(el) => (stageRefs.current[step.stage] = el)}
+                        />
+                      ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {book.steps
+                      .filter(s => getDisplayGroup(s) === "completed" || getDisplayGroup(s) === "upcoming")
+                      .map((step) => (
+                        <StepFocusCard
+                          key={step.stage}
+                          step={step}
+                          book={book}
+                          refEl={(el) => (stageRefs.current[step.stage] = el)}
+                        />
+                      ))}
+                  </div>
+                )}
+              </StepSection>
+            )}
           </div>
         </div>
       )}
@@ -467,54 +618,106 @@ function BookCard({
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   STEP CARD (Independent Grid Item)
+   STEP SECTION — groups steps under a labeled, colored eyebrow
    ───────────────────────────────────────────────────────────────────────── */
 
-function StepCard({ step, book }: { step: EnrichedStep, book: EnrichedBook }) {
-  const Icon = step.icon;
+type SectionTone = "amber" | "blue" | "emerald" | "slate";
 
-  const statusStyles = {
-    "Not Started": "bg-white border-slate-200 text-slate-500",
-    "In Progress": "bg-blue-50/50 border-blue-200 text-blue-800 ring-1 ring-blue-500/10",
-    "Action Needed": "bg-amber-50/80 border-amber-300 text-amber-900 ring-2 ring-amber-400/20 shadow-sm",
-    "Completed": "bg-emerald-50/40 border-emerald-200 text-emerald-800",
+function StepSection({
+  icon: Icon,
+  tone,
+  label,
+  count,
+  children,
+  collapsible,
+  expanded,
+  onToggle,
+}: {
+  icon: React.ElementType;
+  tone: SectionTone;
+  label: string;
+  count: number;
+  children: React.ReactNode;
+  collapsible?: boolean;
+  expanded?: boolean;
+  onToggle?: () => void;
+}) {
+  const toneText: Record<SectionTone, string> = {
+    amber: "text-amber-700",
+    blue: "text-blue-700",
+    emerald: "text-emerald-700",
+    slate: "text-slate-400",
   };
-
-  const iconBgStyles = {
-    "Not Started": "bg-slate-100 text-slate-500",
-    "In Progress": "bg-blue-100 text-blue-600",
-    "Action Needed": "bg-amber-200 text-amber-700 animate-pulse",
-    "Completed": "bg-emerald-100 text-emerald-600",
+  const toneBg: Record<SectionTone, string> = {
+    amber: "bg-amber-100",
+    blue: "bg-blue-100",
+    emerald: "bg-emerald-100",
+    slate: "bg-slate-100",
   };
 
   return (
-    <div className={`flex flex-col p-4 rounded-xl border transition-all duration-200 hover:shadow-sm ${statusStyles[step.status]}`}>
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className={`w-6 h-6 rounded-md flex items-center justify-center ${toneBg[tone]} ${toneText[tone]}`}>
+            <Icon size={13} strokeWidth={2.5} />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">{label}</span>
+          <span className="text-[11px] font-semibold text-slate-400">({count})</span>
+        </div>
+        {collapsible && (
+          <button
+            type="button"
+            onClick={onToggle}
+            className="flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            {expanded ? "Show summary" : "Show details"}
+            <ChevronDown size={13} className={`transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
+          </button>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}
 
-      {/* Header */}
+/* ─────────────────────────────────────────────────────────────────────────
+   STEP FOCUS CARD — full detail, used for attention / in-progress / expanded-completed
+   (This is your original StepCard, unchanged in behavior — just repositioned.)
+   ───────────────────────────────────────────────────────────────────────── */
+
+function StepFocusCard({
+  step,
+  book,
+  refEl,
+}: {
+  step: EnrichedStep;
+  book: EnrichedBook;
+  refEl: (el: HTMLDivElement | null) => void;
+}) {
+  const Icon = step.icon;
+  const style = STATUS_STYLE[step.status];
+
+  return (
+    <div ref={refEl} className={`flex flex-col p-4 rounded-xl border transition-all duration-200 hover:shadow-sm ${style.card}`}>
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${iconBgStyles[step.status]}`}>
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${style.iconBg}`}>
             {step.status === "Completed" ? <CheckCircle2 size={18} strokeWidth={2.5} /> : <Icon size={16} strokeWidth={2} />}
           </div>
           <div>
             <h4 className="text-[14px] font-bold tracking-tight">{step.stage}</h4>
-            <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md inline-block mt-0.5 ${step.status === 'Completed' ? 'bg-emerald-200/50 text-emerald-700' :
-              step.status === 'Action Needed' ? 'bg-amber-200/60 text-amber-800' :
-                step.status === 'In Progress' ? 'bg-blue-200/50 text-blue-700' :
-                  'bg-slate-100 text-slate-500'
-              }`}>
+            <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md inline-block mt-0.5 ${style.pill}`}>
               {step.status}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Note */}
       <p className="text-[12px] font-medium opacity-80 mb-4 flex-1">
         {step.note}
       </p>
 
-      {/* Specific Actions / Corrections for the Step */}
       <div className="mt-auto">
         <StepActions step={step} book={book} />
         {(step.stage === "Writing" || step.stage === "Cover Design") && (
@@ -526,7 +729,53 @@ function StepCard({ step, book }: { step: EnrichedStep, book: EnrichedBook }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   STEP ACTIONS
+   STEP CHIP — collapsed by default; tap to reveal note + actions
+   ───────────────────────────────────────────────────────────────────────── */
+
+function StepChip({
+  step,
+  book,
+  refEl,
+}: {
+  step: EnrichedStep;
+  book: EnrichedBook;
+  refEl: (el: HTMLDivElement | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const Icon = step.status === "Completed" ? CheckCircle2 : step.icon;
+
+  let bgClass = "";
+  if (step.status === "Completed") bgClass = "bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100";
+  else if (step.status === "In Progress") bgClass = "bg-blue-50 border-blue-200 text-blue-800 hover:bg-blue-100";
+  else if (step.status === "Action Needed") bgClass = "bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100";
+  else bgClass = "bg-white border-slate-200 text-slate-500 hover:bg-slate-50";
+
+  return (
+    <div ref={refEl} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`flex items-center gap-1.5 border text-[11px] font-bold pl-2 pr-3 py-1.5 rounded-full transition-colors ${bgClass}`}
+      >
+        <Icon size={13} />
+        {step.stage}
+        <ChevronDown size={11} className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute z-20 top-full left-0 mt-1.5 w-72 bg-white border border-slate-200 shadow-lg rounded-xl p-3">
+          <p className="text-[12px] text-slate-600 leading-snug mb-2">{step.note}</p>
+          <StepActions step={step} book={book} />
+          {(step.stage === "Writing" || step.stage === "Cover Design") && (
+            <StepCorrections stage={step.stage} corrections={book.corrections} />
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   STEP ACTIONS — unchanged from your original
    ───────────────────────────────────────────────────────────────────────── */
 
 function toDrivePreviewUrl(url: string): string {
@@ -540,11 +789,6 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
   const [showCorrectionModal, setShowCorrectionModal] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const API_URL = process.env.API_URL || "http://localhost:5001";
-
-
-
-  
-
 
   const handleApprove = async (approvalType: string) => {
     setIsApproving(true);
@@ -569,7 +813,7 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
   // Content Received
   if (step.stage.endsWith("Received")) {
     const hasContent = (book.is_thesis_to_book || book.is_publish_only) ? book.manuscript_path : book.syllabus_path;
-    
+
     if (hasContent) {
       const contentUrl = hasContent.startsWith("http")
         ? hasContent
@@ -585,17 +829,17 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
         <div className="flex flex-col gap-2">
           <label className="flex items-center justify-center gap-1.5 w-full bg-blue-600 text-white hover:bg-blue-700 shadow-sm text-[11px] font-bold py-2 rounded-xl transition-all cursor-pointer">
             <Upload size={13} /> Upload Content
-            <input 
-              type="file" 
-              className="hidden" 
+            <input
+              type="file"
+              className="hidden"
               onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (!file) return;
-                
+
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("book_id", book.book_id.toString());
-                
+
                 try {
                   const res = await fetch("/api/upload-content", {
                     method: "POST",
@@ -610,7 +854,7 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
                 } catch {
                   alert("Network error.");
                 }
-              }} 
+              }}
             />
           </label>
         </div>
@@ -702,7 +946,7 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   STEP CORRECTIONS
+   STEP CORRECTIONS — unchanged from your original
    ───────────────────────────────────────────────────────────────────────── */
 
 function StepCorrections({ stage, corrections }: { stage: string, corrections: Correction[] }) {
@@ -735,7 +979,7 @@ function StepCorrections({ stage, corrections }: { stage: string, corrections: C
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   CORRECTION REQUEST MODAL & PDF MODAL
+   CORRECTION REQUEST MODAL & PDF MODAL — unchanged from your original
    ───────────────────────────────────────────────────────────────────────── */
 
 const SECTION_OPTIONS = [

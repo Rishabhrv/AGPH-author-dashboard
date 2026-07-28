@@ -72,7 +72,7 @@ export async function getAuthorDetails() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
     });
-    
+
     if (!res.ok) return null;
 
     const data = await res.json();
@@ -95,13 +95,13 @@ export async function getAuthorProfileData() {
   try {
     const res = await fetch(`${apiUrl}/api/author/profile`, {
       method: "GET",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
       cache: "no-store"
     });
-    
+
     if (!res.ok) return null;
 
     const data = await res.json();
@@ -126,13 +126,13 @@ export async function updateAuthorProfileData(profileData: any) {
   try {
     const res = await fetch(`${apiUrl}/api/author/profile`, {
       method: "PUT",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify(profileData)
     });
-    
+
     if (!res.ok) {
       return { success: false, message: "Failed to update profile" };
     }
@@ -153,12 +153,12 @@ export async function uploadAuthorProfilePhoto(formData: FormData) {
   try {
     const res = await fetch(`${apiUrl}/api/author/photo`, {
       method: "POST",
-      headers: { 
+      headers: {
         "Authorization": `Bearer ${token}`
       },
       body: formData
     });
-    
+
     if (!res.ok) {
       return { success: false, message: "Failed to upload photo" };
     }
@@ -184,13 +184,13 @@ export async function getAuthorSalesData() {
   try {
     const res = await fetch(`${apiUrl}/api/author/sales`, {
       method: "GET",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
       cache: "no-store"
     });
-    
+
     if (!res.ok) return null;
 
     const data = await res.json();
@@ -215,13 +215,13 @@ export async function getAuthorReviewsData() {
   try {
     const res = await fetch(`${apiUrl}/api/author/reviews`, {
       method: "GET",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
       cache: "no-store"
     });
-    
+
     if (!res.ok) return null;
 
     const data = await res.json();
@@ -232,39 +232,39 @@ export async function getAuthorReviewsData() {
       };
     }
     return null;
-    } catch (e) {
-      console.error("Reviews fetch error:", e);
-      return null;
-    }
+  } catch (e) {
+    console.error("Reviews fetch error:", e);
+    return null;
   }
-  
-  export async function getAuthorBooksProgressData() {
-    const token = cookies().get("auth_token")?.value;
-    if (!token) return null;
-  
-    const apiUrl = process.env.API_URL || "http://localhost:5001";
-    try {
-      const res = await fetch(`${apiUrl}/api/author/books-progress`, {
-        method: "GET",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        cache: "no-store"
-      });
-      
-      if (!res.ok) return null;
-  
-      const data = await res.json();
-      if (data.success) {
-        return data.books || [];
-      }
-      return null;
-    } catch (e) {
-      console.error("Books progress fetch error:", e);
-      return null;
+}
+
+export async function getAuthorBooksProgressData() {
+  const token = cookies().get("auth_token")?.value;
+  if (!token) return null;
+
+  const apiUrl = process.env.API_URL || "http://localhost:5001";
+  try {
+    const res = await fetch(`${apiUrl}/api/author/books-progress`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      cache: "no-store"
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    if (data.success) {
+      return data.books || [];
     }
+    return null;
+  } catch (e) {
+    console.error("Books progress fetch error:", e);
+    return null;
   }
+}
 
 export async function submitAuthorOnboarding(formData: FormData) {
   const token = cookies().get("auth_token")?.value;
@@ -274,12 +274,12 @@ export async function submitAuthorOnboarding(formData: FormData) {
   try {
     const res = await fetch(`${apiUrl}/api/author/onboarding`, {
       method: "POST",
-      headers: { 
+      headers: {
         "Authorization": `Bearer ${token}`
       },
       body: formData
     });
-    
+
     if (!res.ok) {
       return { success: false, message: "Failed to submit onboarding" };
     }
@@ -300,13 +300,13 @@ export async function getAuthorBadges() {
   try {
     const res = await fetch(`${apiUrl}/api/author/badges`, {
       method: "GET",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
       cache: "no-store"
     });
-    
+
     if (!res.ok) return null;
     const data = await res.json();
     return data.success ? data.data : null;
@@ -324,13 +324,13 @@ export async function syncAuthorBadges(badgeData: any) {
   try {
     const res = await fetch(`${apiUrl}/api/author/badges/sync`, {
       method: "POST",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify(badgeData)
     });
-    
+
     const data = await res.json();
     return data;
   } catch (e) {
@@ -347,13 +347,13 @@ export async function getAuthorLeaderboard() {
   try {
     const res = await fetch(`${apiUrl}/api/author/leaderboard`, {
       method: "GET",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
       cache: "no-store"
     });
-    
+
     if (!res.ok) return null;
     const data = await res.json();
     return data.success ? data.data : null;
