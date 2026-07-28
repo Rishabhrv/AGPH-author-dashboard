@@ -2,20 +2,35 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, User, Lock, AlertCircle, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import {
+  Loader2,
+  User,
+  Lock,
+  AlertCircle,
+  ArrowRight,
+  BookOpen,
+  TrendingUp,
+  Star,
+  Eye,
+  EyeOff,
+  IndianRupee,
+} from "lucide-react";
 import { loginAction } from "@/actions/auth";
+import Logo from "@/public/Logo/AGPH_White_Logo.webp";
 
 export default function LoginCo() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [errorMsg, setErrorMsg] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setErrorMsg("");
-    
+
     startTransition(async () => {
       const res = await loginAction(null, formData);
-      
+
       if (res?.error) {
         setErrorMsg(res.error);
       } else if (res?.success) {
@@ -25,130 +40,220 @@ export default function LoginCo() {
   }
 
   return (
-    <div className="min-h-screen w-full flex bg-white">
-      {/* Left Panel - Image/Marketing */}
-      <div className="hidden lg:flex w-1/2 relative bg-ink items-center justify-center overflow-hidden">
-        {/* Background Image */}
+    <div className="min-h-screen w-full flex bg-[#f4f7fb]">
+
+      {/* ── LEFT PANEL ── */}
+      <div className="hidden lg:flex w-[52%] relative bg-slate-900  overflow-hidden">
+        {/* Cover image */}
         <div className="absolute inset-0">
-          <img 
-            src="/login-cover.png" 
-            alt="Author Dashboard" 
-            className="w-full h-full object-cover opacity-60"
+          <img
+            src="/login-cover.png"
+            alt="Author Dashboard"
+            className="w-full h-full object-cover opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900/80 to-[#275697]/40" />
         </div>
-        
-        {/* Content Overlay */}
-        <div className="relative z-10 flex flex-col items-center text-center px-12 max-w-lg">
-          <div className="w-16 h-16 bg-gradient-to-tr from-pink to-yellow rounded-2xl flex items-center justify-center text-white font-extrabold text-2xl shadow-xl mb-8 border border-white/20 backdrop-blur-sm">
-            AG
+
+        {/* Decorative glows */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-[#275697]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-56 h-56 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col px-14 py-16  w-full h-full justify-between">
+          {/* Top — Logo */}
+          <div className="flex items-center">
+            <Image
+              src={Logo}
+              alt="AGPH Logo"
+              className="h-20 w-auto"
+              height={40}
+              width={82}
+              priority
+            />
           </div>
-          <h2 className="text-4xl font-extrabold text-white tracking-tight mb-4 leading-tight">
-            Empower your writing journey.
-          </h2>
-          <p className="text-white/70 text-lg leading-relaxed">
-            Access your author dashboard to track sales, manage royalties, and connect with your audience in real-time.
-          </p>
+
+          {/* Middle — Headline + Features */}
+          <div className="mb-auto mt-10 w-full">
+            <h2 className="text-[45px] font-extrabold text-white tracking-tight leading-[1.15] mb-4">
+              From manuscripts <br /> to salesmanage everything <br /><span className="text-sky-400">one dashboard.</span>
+
+            </h2>
+            <p className="text-[15px] font-medium text-slate-400 leading-j max-w-sm mb-7">
+              Track sales, manage royalties, monitor reviews, and grow your author career — all from one place.
+            </p>
+
+            {/* Feature list */}
+            <div className="flex flex-col gap-5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-white/[0.08] border border-white/[0.08] flex items-center justify-center">
+                  <TrendingUp size={16} className="text-emerald-400" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-white">Real-time Sales Analytics</p>
+                  <p className="text-[12px] font-medium text-slate-500">Track units sold across all platforms</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-white/[0.08] border border-white/[0.08] flex items-center justify-center">
+                  <IndianRupee size={16} className="text-sky-400" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-white">Royalty Management</p>
+                  <p className="text-[12px] font-medium text-slate-500">Transparent earnings breakdown</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-white/[0.08] border border-white/[0.08] flex items-center justify-center">
+                  <Star size={16} className="text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-white">Ratings & Reviews</p>
+                  <p className="text-[12px] font-medium text-slate-500">Monitor reader feedback live</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Right Panel - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-ink/5 relative">
-        {/* Decorative elements for the right panel */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-pink/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-yellow/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="w-full max-w-md relative z-10">
-          
-          <div className="mb-10 lg:hidden text-center">
-             <div className="w-12 h-12 bg-ink text-white rounded-xl flex items-center justify-center mx-auto mb-4 font-extrabold text-xl shadow-md">
-                AG
-             </div>
+      {/* ── RIGHT PANEL ── */}
+      <div className="w-full lg:w-[48%] flex items-center justify-center px-6 sm:px-12 py-10 relative">
+        {/* Subtle background decoration */}
+        <div className="absolute top-[-80px] right-[-60px] w-[300px] h-[300px] rounded-full bg-[#275697]/[0.04] blur-3xl pointer-events-none" />
+        <div className="absolute bottom-[-60px] left-[-40px] w-[250px] h-[250px] rounded-full bg-sky-400/[0.03] blur-3xl pointer-events-none" />
+
+        <div className="w-full max-w-[400px] relative z-10">
+          {/* Mobile logo */}
+          <div className="mb-8 lg:hidden flex items-center">
+            <Image
+              src={Logo}
+              alt="AGPH Logo"
+              className="h-9 w-auto"
+              height={36}
+              width={74}
+              priority
+            />
           </div>
 
+          {/* Heading */}
           <div className="mb-8">
-            <h1 className="text-3xl font-extrabold text-ink tracking-tight mb-2">
+            <h1 className="text-[28px] font-extrabold text-slate-900 tracking-tight leading-tight">
               Welcome back
             </h1>
-            <p className="text-[14px] text-ink/60">
-              Sign in to your account to continue
+            <p className="mt-1.5 text-[14px] font-medium text-slate-500">
+              Sign in to your author dashboard
             </p>
           </div>
 
+          {/* Error */}
           {errorMsg && (
-            <div className="mb-6 p-4 bg-pink/10 border border-pink/20 rounded-xl flex items-start gap-3 text-pink">
-              <AlertCircle size={18} className="shrink-0 mt-0.5" />
+            <div className="mb-5 p-3.5 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3 text-red-600">
+              <AlertCircle size={16} className="shrink-0 mt-0.5" />
               <p className="text-[13px] font-medium leading-relaxed">{errorMsg}</p>
             </div>
           )}
 
-          <form action={handleSubmit} className="flex flex-col gap-6">
-            
-            <div className="flex flex-col gap-2">
-              <label className="text-[12px] font-bold text-ink/70 uppercase tracking-wider pl-1">
+          {/* Form */}
+          <form action={handleSubmit} className="flex flex-col gap-4">
+            {/* Username */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-semibold text-slate-700 ml-0.5">
                 Username
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors group-focus-within:text-ink">
-                  <User size={18} className="text-ink/40 group-focus-within:text-ink transition-colors" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <User
+                    size={16}
+                    className="text-slate-400 group-focus-within:text-[#275697] transition-colors"
+                  />
                 </div>
-                <input 
+                <input
                   name="username"
-                  type="text" 
+                  type="text"
                   required
+                  autoComplete="username"
                   placeholder="Enter your username"
-                  className="w-full bg-white border border-ink/10 rounded-xl py-3.5 pl-11 pr-4 text-[15px] font-medium text-ink outline-none focus:border-ink/40 focus:ring-4 focus:ring-ink/5 transition-all shadow-sm"
+                  className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-[14px] font-medium text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#275697] focus:ring-4 focus:ring-[#275697]/10 transition-all shadow-sm"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between pl-1">
-                <label className="text-[12px] font-bold text-ink/70 uppercase tracking-wider">
+            {/* Password */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between ml-0.5">
+                <label className="text-[13px] font-semibold text-slate-700">
                   Password
                 </label>
-                <a href="#" className="text-[12px] font-bold text-ink/60 hover:text-ink transition-colors">
+                <a
+                  href="#"
+                  className="text-[12px] font-semibold text-[#275697] hover:underline transition-colors"
+                >
                   Forgot password?
                 </a>
               </div>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors group-focus-within:text-ink">
-                  <Lock size={18} className="text-ink/40 group-focus-within:text-ink transition-colors" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Lock
+                    size={16}
+                    className="text-slate-400 group-focus-within:text-[#275697] transition-colors"
+                  />
                 </div>
-                <input 
+                <input
                   name="password"
-                  type="password" 
+                  type={showPassword ? "text" : "password"}
                   required
+                  autoComplete="current-password"
                   placeholder="••••••••"
-                  className="w-full bg-white border border-ink/10 rounded-xl py-3.5 pl-11 pr-4 text-[15px] font-medium text-ink outline-none focus:border-ink/40 focus:ring-4 focus:ring-ink/5 transition-all shadow-sm"
+                  className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-11 text-[14px] font-medium text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#275697] focus:ring-4 focus:ring-[#275697]/10 transition-all shadow-sm"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
-            <button 
-              type="submit" 
+            {/* Submit */}
+            <button
+              type="submit"
               disabled={isPending}
-              className="mt-4 w-full bg-ink text-white rounded-xl py-4 text-[15px] font-bold flex items-center justify-center gap-2 hover:bg-ink/90 transition-all shadow-lg shadow-ink/20 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 disabled:cursor-not-allowed group"
+              className="mt-3 w-full bg-slate-900 text-white rounded-xl py-3.5 text-[14px] font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:active:scale-100 disabled:cursor-not-allowed group"
             >
               {isPending ? (
-                <Loader2 size={18} className="animate-spin" />
+                <Loader2 size={16} className="animate-spin" />
               ) : (
                 <>
-                  Sign in to Dashboard
-                  <ArrowRight size={18} className="opacity-70 group-hover:translate-x-1 transition-transform" />
+                  Sign in
+                  <ArrowRight
+                    size={16}
+                    className="opacity-60 group-hover:translate-x-0.5 transition-transform"
+                  />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-10 text-center">
-            <p className="text-[13px] text-ink/60">
-              Don't have an author account? <a href="#" className="font-bold text-ink hover:underline">Apply now</a>
+          {/* Footer */}
+          <div className="mt-7 pt-5 border-t border-slate-100 text-center">
+            <p className="text-[13px] text-slate-500">
+              Don&apos;t have an author account?{" "}
+              <a href="#" className="font-bold text-[#275697] hover:underline">
+                Apply now
+              </a>
             </p>
           </div>
 
+          {/* Copyright */}
+          <p className="mt-8 text-center text-[12px] font-medium text-slate-400">
+            © {new Date().getFullYear()} AGPH · Author Dashboard
+          </p>
         </div>
       </div>
     </div>
   );
 }
+
