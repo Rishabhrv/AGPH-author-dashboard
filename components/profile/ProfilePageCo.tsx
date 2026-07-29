@@ -366,7 +366,7 @@ export default function ProfilePageCo({ initialProfileData, salesData, reviewsDa
                 {top5Books.map((book: any, idx: number) => (
                   <div key={idx} className="flex items-center gap-3 py-2 -mx-1 px-1 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer">
                     {book.coverImage ? (
-                      <img src={book.coverImage.startsWith('http') ? book.coverImage : `${STORE_URL}${book.coverImage.startsWith('/') ? '' : '/'}${book.coverImage}`} alt={book.title} className="w-10 h-17 rounded-sm shrink-0 shadow-sm object-cover" />
+                      <img src={book.coverImage.startsWith('http') ? book.coverImage : `${storeUrl}${book.coverImage.startsWith('/') ? '' : '/'}${book.coverImage}`} alt={book.title} className="w-10 h-17 rounded-sm shrink-0 shadow-sm object-cover" />
                     ) : (
                       <div className="w-12 h-12 rounded-xl shrink-0 shadow-sm" style={{ background: book.coverGradient }} />
                     )}
