@@ -43,8 +43,6 @@ import {
 
 type FilterMode = "preset" | "single" | "range" | "month";
 type TxnSort = "recent" | "earnings";
-const storeUrl = process.env.STORE_URL || "http://localhost:5000";
-
 
 // Inline styles (not Tailwind color tokens) so this doesn't depend on your theme config
 const RANK_BADGE_STYLE: Record<number, { background: string; color: string }> = {
@@ -68,7 +66,7 @@ function daysBetweenInclusive(startISO: string, endISO: string): number {
   return Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
 }
 
-export default function SalesPage({ initialData }: { initialData?: any; storeUrl?: string }) {
+export default function SalesPage({ initialData, storeUrl = "http://localhost:5000" }: { initialData?: any; storeUrl?: string }) {
   const [selectedBook, setSelectedBook] = useState<string | null>(null);
   const [hoveredState, setHoveredState] = useState<string | null>(null);
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null);

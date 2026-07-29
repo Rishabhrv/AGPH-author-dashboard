@@ -35,11 +35,10 @@ import { getAuthorProfileData, updateAuthorProfileData, uploadAuthorProfilePhoto
 import { calculateStats } from "./BadgeSystemCo";
 // Signature gradient reused across the hero + primary CTAs, tying the page
 // back to the community dashboard's blue-violet identity.
+// back to the community dashboard's blue-violet identity.
 const BRAND_GRADIENT = "linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #6366f1 100%)";
 
-const STORE_URL = process.env.STORE_URL || "http://localhost:5000";
-
-export default function ProfilePageCo({ initialProfileData, salesData, reviewsData }: { initialProfileData: any, salesData: any, reviewsData: any }) {
+export default function ProfilePageCo({ initialProfileData, salesData, reviewsData, storeUrl = "http://localhost:5000" }: { initialProfileData: any, salesData: any, reviewsData: any, storeUrl?: string }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [profileData, setProfileData] = useState<AuthorProfile | null>(initialProfileData);
   const [isPhotoUpdated, setIsPhotoUpdated] = useState(false);
@@ -217,7 +216,7 @@ export default function ProfilePageCo({ initialProfileData, salesData, reviewsDa
                   {isUploadingPhoto ? (
                     <Loader2 size={32} className="animate-spin text-white/70" />
                   ) : profile.profileImageUrl ? (
-                    <img src={profile.profileImageUrl} alt={profile.authorName} className="w-full h-full " />
+                    <img src={profile.profileImageUrl.startsWith('http') ? profile.profileImageUrl : `${storeUrl}${profile.profileImageUrl}`} alt={profile.authorName} className="w-full h-full object-cover" />
                   ) : (
                     <User size={40} className="text-white/50" />
                   )}

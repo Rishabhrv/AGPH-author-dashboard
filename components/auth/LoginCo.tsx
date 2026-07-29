@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   Loader2,
-  User,
+  Mail,
   Lock,
   AlertCircle,
   ArrowRight,
@@ -24,8 +24,25 @@ export default function LoginCo() {
   const [isPending, startTransition] = useTransition();
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutSeconds, setLockoutSeconds] = useState(0);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (lockoutSeconds > 0) {
+      timer = setInterval(() => {
+        setLockoutSeconds((prev) => prev - 1);
+      }, 1000);
+    } else if (lockoutSeconds === 0) {
+      if (errorMsg === "Too many failed attempts. Please wait.") {
+        setErrorMsg("");
+      }
+    }
+    return () => clearInterval(timer);
+  }, [lockoutSeconds, errorMsg]);
 
   async function handleSubmit(formData: FormData) {
+    if (lockoutSeconds > 0) return;
     setErrorMsg("");
 
     startTransition(async () => {
@@ -33,7 +50,11 @@ export default function LoginCo() {
 
       if (res?.error) {
         setErrorMsg(res.error);
+        if (res.lockoutSeconds) {
+          setLockoutSeconds(res.lockoutSeconds);
+        }
       } else if (res?.success) {
+        setFailedAttempts(0);
         router.push("/");
       }
     });
@@ -75,11 +96,11 @@ export default function LoginCo() {
           {/* Middle — Headline + Features */}
           <div className="mb-auto mt-10 w-full">
             <h2 className="text-[45px] font-extrabold text-white tracking-tight leading-[1.15] mb-4">
-              From manuscripts <br /> to salesmanage everything <br /><span className="text-sky-400">one dashboard.</span>
+              From manuscripts <br /> to sales manage everything <br /><span className="text-sky-400">one dashboard.</span>
 
             </h2>
             <p className="text-[15px] font-medium text-slate-400 leading-j max-w-sm mb-7">
-              Track sales, manage royalties, monitor reviews, and grow your author career — all from one place.
+              Track sales, manage royalties, monitor reviews, and grow your author career all from one place.
             </p>
 
             {/* Feature list */}
@@ -155,24 +176,24 @@ export default function LoginCo() {
 
           {/* Form */}
           <form action={handleSubmit} className="flex flex-col gap-4">
-            {/* Username */}
+            {/* Email */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] font-semibold text-slate-700 ml-0.5">
-                Username
+                Email
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <User
+                  <Mail
                     size={16}
                     className="text-slate-400 group-focus-within:text-[#275697] transition-colors"
                   />
                 </div>
                 <input
-                  name="username"
-                  type="text"
+                  name="email"
+                  type="email"
                   required
-                  autoComplete="username"
-                  placeholder="Enter your username"
+                  autoComplete="email"
+                  placeholder="Enter your email"
                   className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-[14px] font-medium text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#275697] focus:ring-4 focus:ring-[#275697]/10 transition-all shadow-sm"
                 />
               </div>
@@ -220,11 +241,13 @@ export default function LoginCo() {
             {/* Submit */}
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isPending || lockoutSeconds > 0}
               className="mt-3 w-full bg-slate-900 text-white rounded-xl py-3.5 text-[14px] font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:active:scale-100 disabled:cursor-not-allowed group"
             >
               {isPending ? (
                 <Loader2 size={16} className="animate-spin" />
+              ) : lockoutSeconds > 0 ? (
+                `Try again in ${lockoutSeconds}s`
               ) : (
                 <>
                   Sign in

@@ -13,6 +13,7 @@ export default function OnboardingWrapper({
   const [isSkipped, setIsSkipped] = useState(false);
   const [completed, setCompleted] = useState(true); // Default true to avoid flash
   const [loading, setLoading] = useState(true);
+  const [authorProfile, setAuthorProfile] = useState<any>(null);
 
   useEffect(() => {
     // Check if user previously skipped on this device
@@ -20,8 +21,11 @@ export default function OnboardingWrapper({
     if (skipped) setIsSkipped(true);
 
     getAuthorProfileData().then((profile) => {
-      if (profile && profile.isOnboarded === false) {
-        setCompleted(false);
+      if (profile) {
+        setAuthorProfile(profile);
+        if (profile.isOnboarded === false) {
+          setCompleted(false);
+        }
       }
       setLoading(false);
     }).catch(() => setLoading(false));
@@ -70,6 +74,7 @@ export default function OnboardingWrapper({
         <AuthorOnboardingForm 
           onComplete={handleComplete} 
           onSkip={handleSkip} 
+          initialProfile={authorProfile}
         />
       )}
     </>
