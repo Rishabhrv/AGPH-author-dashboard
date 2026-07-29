@@ -8,10 +8,11 @@ export default async function ProfilePage() {
     getAuthorSalesData(),
     getAuthorReviewsData()
   ]);
-  
+  const storeUrl = process.env.STORE_URL || "http://localhost:5000";
+
   return (
     <AppShell active="profile">
-      <ProfilePageCo initialProfileData={profileData} salesData={salesData} reviewsData={reviewsData} />
+      <ProfilePageCo initialProfileData={profileData} salesData={salesData} reviewsData={reviewsData} storeUrl={storeUrl} />
     </AppShell>
   );
 }

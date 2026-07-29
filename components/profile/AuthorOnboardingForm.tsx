@@ -10,9 +10,10 @@ type Step = 1 | 2 | 3 | 4;
 interface Props {
   onComplete: () => void;
   onSkip: () => void;
+  initialProfile?: any;
 }
 
-export default function AuthorOnboardingForm({ onComplete, onSkip }: Props) {
+export default function AuthorOnboardingForm({ onComplete, onSkip, initialProfile }: Props) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<Step>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,12 +22,12 @@ export default function AuthorOnboardingForm({ onComplete, onSkip }: Props) {
 
   // Form State
   const [formData, setFormData] = useState({
-    fullName: "",
-    phone: "",
-    email: "",
-    address: "",
-    idNumber: "",
-    bio: "",
+    fullName: initialProfile?.legalName || initialProfile?.authorName || "",
+    phone: initialProfile?.phone || "",
+    email: initialProfile?.email || "",
+    address: initialProfile?.address || "",
+    idNumber: initialProfile?.idProofNumber || "",
+    bio: initialProfile?.bio || "",
   });
 
   // Files

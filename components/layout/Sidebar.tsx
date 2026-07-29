@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -23,6 +24,8 @@ import {
   IndianRupee,
   LayoutDashboard,
 } from "lucide-react";
+import Logo from "@/public/Logo/AGPH-Logo-Black-600x290.webp";
+
 
 // --- Navigation Data ---
 const generalNav = [
@@ -65,20 +68,22 @@ export default function Sidebar({ active }: { active: string }) {
 
   return (
     <aside
-      className={`sticky top-5 h-[calc(100vh-40px)] hidden lg:flex flex-col shrink-0 bg-white border border-slate-200 rounded-[22px] py-5 shadow-sm transition-all duration-300 ease-in-out ${
-        isCollapsed ? "w-[75px] px-3" : "w-[240px] px-4"
-      }`}
+      className={`sticky top-5 h-[calc(100vh-40px)] hidden lg:flex flex-col shrink-0 bg-white border border-slate-200 rounded-[22px] py-5 shadow-sm transition-all duration-300 ease-in-out ${isCollapsed ? "w-[75px] px-3" : "w-[240px] px-4"
+        }`}
     >
       {/* Header / Logo */}
       <div
-        className={`flex items-center mb-8 h-7 ${
-          isCollapsed ? "justify-center" : "justify-between px-1"
-        }`}
+        className={`flex items-center mt-3 mb-8 h-10 ${isCollapsed ? "justify-center" : " px-1"
+          }`}
       >
         {!isCollapsed && (
-          <Link href="/" className="text-slate-900 text-xl font-extrabold tracking-tight whitespace-nowrap flex items-center gap-2">
-            <span className="bg-slate-900 text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm">AG</span>
-            AGPH
+          <Link href="/" className="w-full text-slate-900 text-xl font-extrabold tracking-tight whitespace-nowrap flex items-center justify-center gap-2">
+            <Image
+              src={Logo}
+              alt="AGPH Logo"
+              className="h-13 p-6 w-auto items-center"
+              unoptimized
+            />
           </Link>
         )}
         <button
@@ -139,9 +144,8 @@ export default function Sidebar({ active }: { active: string }) {
       <div className="pt-4 mt-auto border-t border-slate-100">
         <button
           onClick={handleLogout}
-          className={`w-full flex items-center py-2.5 text-slate-500 text-sm font-medium hover:text-slate-800 transition-colors ${
-            isCollapsed ? "justify-center px-0" : "gap-3 px-3"
-          }`}
+          className={`w-full flex items-center py-2.5 text-slate-500 text-sm font-medium hover:text-slate-800 transition-colors ${isCollapsed ? "justify-center px-0" : "gap-3 px-3"
+            }`}
           title={isCollapsed ? "Log out" : undefined}
         >
           <LogOut size={17} strokeWidth={2} className="shrink-0" />
@@ -171,13 +175,11 @@ function NavRow({
       <a
         href={item.href}
         title={isCollapsed ? item.label : undefined}
-        className={`relative flex items-center py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-          isCollapsed ? "justify-center " : "gap-3 px-3"
-        } ${
-          isActive
+        className={`relative flex items-center py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${isCollapsed ? "justify-center " : "gap-3 px-3"
+          } ${isActive
             ? "bg-sky-50 text-[#275697]"
             : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-        }`}
+          }`}
       >
         {isActive && (
           <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-md bg-[#275697] transition-all duration-300" />

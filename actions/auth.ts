@@ -9,11 +9,11 @@ export async function logoutAction() {
 }
 
 export async function loginAction(prevState: any, formData: FormData) {
-  const username = formData.get("username") as string;
+  const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  if (!username || !password) {
-    return { error: "Username and password are required" };
+  if (!email || !password) {
+    return { error: "Email and password are required" };
   }
 
   const apiUrl = process.env.API_URL || "http://localhost:5001";
@@ -24,20 +24,22 @@ export async function loginAction(prevState: any, formData: FormData) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username: email, password }),
     });
 
     if (!res.ok) {
       // Try to parse the error message from the backend, if any
-      let errorMessage = "Invalid username or password";
+      let errorMessage = "Invalid email or password";
+      let lockoutSeconds = 0;
       try {
         const data = await res.json();
         if (data.error) errorMessage = data.error;
         else if (data.message) errorMessage = data.message;
+        if (data.lockout_seconds) lockoutSeconds = data.lockout_seconds;
       } catch (e) {
         // Fallback if not JSON
       }
-      return { error: errorMessage };
+      return { error: errorMessage, lockoutSeconds };
     }
 
     const data = await res.json();

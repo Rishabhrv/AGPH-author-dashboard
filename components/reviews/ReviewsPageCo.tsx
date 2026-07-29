@@ -113,8 +113,11 @@ export default function ReviewsPageCo({ initialData, storeUrl }: { initialData?:
 
   const filteredReviews = useMemo(() => {
     return allReviews.filter((review: any) => {
-      // Date filter
-      if (review.isoDate < activePeriod.start || review.isoDate > activePeriod.end) return false;
+      // Date filter (skip check if preset is 'all' or isoDate is missing and we are on 'all')
+      if (presetDays !== "all" || filterMode !== "preset") {
+        if (!review.isoDate) return false;
+        if (review.isoDate < activePeriod.start || review.isoDate > activePeriod.end) return false;
+      }
       // Platform filter
       if (filterPlatform !== "All Platforms" && review.platform !== filterPlatform) return false;
       // Rating filter
@@ -125,7 +128,7 @@ export default function ReviewsPageCo({ initialData, storeUrl }: { initialData?:
       if (selectedBook && review.book !== selectedBook) return false;
       return true;
     });
-  }, [allReviews, activePeriod, filterPlatform, filterRating, searchQuery, selectedBook]);
+  }, [allReviews, activePeriod, filterPlatform, filterRating, searchQuery, selectedBook, filterMode, presetDays]);
 
   const scrollCarousel = (dir: "left" | "right") => {
     carouselRef.current?.scrollBy({ left: dir === "left" ? -220 : 220, behavior: "smooth" });

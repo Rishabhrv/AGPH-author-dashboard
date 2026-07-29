@@ -528,7 +528,6 @@ export default function DashboardPageCo({ profileData, salesData, reviewsData, b
                 Here's everything happening across your books today — earnings, sales momentum, and what needs your attention.
               </p>
               <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-white">
-                <span className="rounded-md border border-orange-500/30 bg-orange-500/10 px-3 py-1.5 font-bold tracking-wide uppercase text-orange-400">Bestselling Author</span>
                 <span className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 font-bold tracking-wide uppercase text-slate-300">{stats.publishedBooks} published books</span>
               </div>
             </div>

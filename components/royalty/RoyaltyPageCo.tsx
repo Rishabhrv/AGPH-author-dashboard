@@ -27,8 +27,6 @@ import {
 } from "recharts";
 import { formatINR } from "@/lib/sales-page-data";
 
-const storeUrl = process.env.STORE_URL || "http://localhost:5000";
-
 interface Transaction {
   bookTitle: string;
   platform: string;
@@ -65,6 +63,7 @@ interface RoyaltyPageProps {
     transactions: Transaction[];
     books: Book[];
   } | null;
+  storeUrl?: string;
 }
 
 const PLATFORM_COLORS: Record<string, string> = {
@@ -78,7 +77,7 @@ const MONTH_LABELS = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
-export default function RoyaltyPageCo({ initialData }: RoyaltyPageProps) {
+export default function RoyaltyPageCo({ initialData, storeUrl = "http://localhost:5000" }: RoyaltyPageProps) {
   const transactions = useMemo(() => initialData?.transactions || [], [initialData]);
   const books = useMemo(() => initialData?.books || [], [initialData]);
 

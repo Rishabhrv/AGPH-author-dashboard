@@ -479,7 +479,7 @@ function BookCard({
             <h3 className="text-[17px] font-extrabold text-slate-900 truncate group-hover:text-amber-600 transition-colors">{book.title}</h3>
             <span className="flex items-center gap-1 text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200 px-2 py-0.5 rounded-full shrink-0 shadow-sm">
               <BookOpen size={10} />
-              {book.is_thesis_to_book ? "Thesis to Book" : book.is_publish_only ? "Publish Only Book" : "Normal Book"}
+              {book.is_thesis_to_book ? "Thesis to Book" : book.is_publish_only ? "Publish Only Book" : "Writing + Publishing"}
             </span>
             {book.needsAction && (
               <span className="flex items-center gap-1 text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full shrink-0 shadow-sm">
