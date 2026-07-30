@@ -85,6 +85,7 @@ type EnrichedBook = {
   google_link?: string;
   is_thesis_to_book?: boolean | number;
   is_publish_only?: boolean | number;
+  digital_book_sent?: boolean | number;
   corrections: Correction[];
   approvals: string[];
 };
@@ -177,6 +178,9 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
     } else if (book.proof_pdf_link) {
       status = "Action Needed";
       note = "Digital proof ready for approval.";
+    } else if (book.digital_book_sent) {
+      status = "Completed";
+      note = "Digital proof sent.";
     }
     steps.push({ stage: "Digital Proof", status, note, icon: STAGE_ICONS["Digital Proof"] });
   }
@@ -824,42 +828,9 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
           <FileText size={13} /> View Content <ExternalLink size={11} />
         </a>
       );
-    } else {
-      return (
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center justify-center gap-1.5 w-full bg-blue-600 text-white hover:bg-blue-700 shadow-sm text-[11px] font-bold py-2 rounded-xl transition-all cursor-pointer">
-            <Upload size={13} /> Upload Content
-            <input
-              type="file"
-              className="hidden"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-
-                const formData = new FormData();
-                formData.append("file", file);
-                formData.append("book_id", book.book_id.toString());
-
-                try {
-                  const res = await fetch("/api/upload-content", {
-                    method: "POST",
-                    body: formData,
-                  });
-                  if (res.ok) {
-                    window.location.reload();
-                  } else {
-                    const data = await res.json();
-                    alert(data.message || "Failed to upload content.");
-                  }
-                } catch {
-                  alert("Network error.");
-                }
-              }}
-            />
-          </label>
-        </div>
-      );
     }
+    
+    return null;
   }
 
   // Cover Design

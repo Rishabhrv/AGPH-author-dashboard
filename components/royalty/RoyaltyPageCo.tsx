@@ -77,6 +77,7 @@ const MONTH_LABELS = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
+
 export default function RoyaltyPageCo({ initialData, storeUrl = "http://localhost:5000" }: RoyaltyPageProps) {
   const transactions = useMemo(() => initialData?.transactions || [], [initialData]);
   const books = useMemo(() => initialData?.books || [], [initialData]);
