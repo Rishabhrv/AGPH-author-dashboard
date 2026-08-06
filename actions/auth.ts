@@ -200,7 +200,8 @@ export async function getAuthorSalesData() {
       return {
         books: data.books || [],
         transactions: data.transactions || [],
-        royaltySettings: data.royaltySettings || null
+        royaltySettings: data.royaltySettings || null,
+        authorRoyaltyPercentage: data.authorRoyaltyPercentage ?? 100
       };
     }
     return null;

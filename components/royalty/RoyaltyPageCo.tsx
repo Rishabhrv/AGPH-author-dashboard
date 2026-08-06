@@ -58,16 +58,18 @@ interface EnrichedTransaction extends Transaction {
   coverImage: string | null;
 }
 
-interface RoyaltyPageProps {
+export interface RoyaltyPageProps {
   initialData?: {
     transactions: Transaction[];
     books: Book[];
+    authorRoyaltyPercentage?: number;
     royaltySettings?: {
       bw_printing_cost: number;
       color_printing_cost: number;
       hardcover_cost: number;
       paperback_cost: number;
       amazon_flipkart_royalty: number;
+      amazon_flipkart_mrp_royalty: number;
       general_royalty: number;
     } | null;
   } | null;
@@ -142,6 +144,7 @@ export default function RoyaltyPageCo({ initialData, storeUrl = "http://localhos
           hardcover_cost: 180,
           paperback_cost: 100,
           amazon_flipkart_royalty: 0.15,
+          amazon_flipkart_mrp_royalty: 0.15,
           general_royalty: 0.15
         };
 
@@ -161,13 +164,14 @@ export default function RoyaltyPageCo({ initialData, storeUrl = "http://localhos
 
         let royaltyPerBook = 0;
         if (platformMatch === "Amazon" || platformMatch === "Flipkart") {
-          royaltyPerBook = H - ((B * settings.amazon_flipkart_royalty) + J + (settings.amazon_flipkart_royalty * H));
+          royaltyPerBook = H - ((B * settings.amazon_flipkart_royalty) + J + (settings.amazon_flipkart_mrp_royalty * H));
         } else {
           royaltyPerBook = H - ((B * settings.general_royalty) + J);
         }
 
 
-        const royalty = royaltyPerBook * units;
+        const authorPercentage = initialData?.authorRoyaltyPercentage ?? 100;
+        const royalty = (royaltyPerBook * units * authorPercentage) / 100;
 
         return {
           ...t,
@@ -337,7 +341,7 @@ export default function RoyaltyPageCo({ initialData, storeUrl = "http://localhos
             Royalty Earnings
           </h1>
           <p className="text-[13px] text-slate-500 mt-1">
-            Effective {lifetimeStats.gross > 0 ? ((lifetimeStats.royalty / lifetimeStats.gross) * 100).toFixed(1) : 0}% royalty · Lifetime {formatINR(lifetimeStats.royalty)}
+            {initialData?.authorRoyaltyPercentage ?? 100}% royalty · Lifetime {formatINR(lifetimeStats.royalty)}
           </p>
         </div>
         <div className="flex items-center gap-3">

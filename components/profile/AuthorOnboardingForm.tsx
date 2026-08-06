@@ -207,13 +207,13 @@ export default function AuthorOnboardingForm({ onComplete, onSkip, initialProfil
           {/* Step 1 */}
           {currentStep === 1 && (
             <div className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300 max-w-xl">
-              {initialProfile?.isRejected && (
+              {initialProfile?.isApproved === 2 && (
                 <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 flex gap-3 items-start shadow-sm mb-4">
                   <AlertTriangle className="text-rose-500 shrink-0 mt-0.5" size={20} />
                   <div>
                     <h3 className="text-sm font-bold text-rose-800">Verification Rejected</h3>
                     <p className="text-sm text-rose-700 mt-1 leading-relaxed">
-                      {initialProfile.rejectionReason || "There was an issue with your profile details or documents. Please update the correct information and resubmit."}
+                      {initialProfile.remark || "There was an issue with your profile details or documents. Please update the correct information and resubmit."}
                     </p>
                   </div>
                 </div>
