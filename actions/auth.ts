@@ -49,7 +49,7 @@ export async function loginAction(prevState: any, formData: FormData) {
       cookies().set("auth_token", data.token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 24 * 7, // 1 week
+        maxAge: 60 * 60 * 24, // 1 day
         path: "/",
       });
       return { success: true };
@@ -199,7 +199,8 @@ export async function getAuthorSalesData() {
     if (data.success) {
       return {
         books: data.books || [],
-        transactions: data.transactions || []
+        transactions: data.transactions || [],
+        royaltySettings: data.royaltySettings || null
       };
     }
     return null;

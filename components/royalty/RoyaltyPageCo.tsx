@@ -62,6 +62,14 @@ interface RoyaltyPageProps {
   initialData?: {
     transactions: Transaction[];
     books: Book[];
+    royaltySettings?: {
+      bw_printing_cost: number;
+      color_printing_cost: number;
+      hardcover_cost: number;
+      paperback_cost: number;
+      amazon_flipkart_royalty: number;
+      general_royalty: number;
+    } | null;
   } | null;
   storeUrl?: string;
 }
@@ -83,7 +91,7 @@ export default function RoyaltyPageCo({ initialData, storeUrl = "http://localhos
   const books = useMemo(() => initialData?.books || [], [initialData]);
 
   // Filters
-  const [selectedYear, setSelectedYear] = useState<string>("all");
+  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
   const [searchQuery, setSearchQuery] = useState("");
   const [txnSort, setTxnSort] = useState<"recent" | "earnings">("recent");
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null);
@@ -127,25 +135,35 @@ export default function RoyaltyPageCo({ initialData, storeUrl = "http://localhos
         const B = t.pages || details.pages || 0; // Number of Pages
         const D = t.colorPages || details.colorPages || 0; // Color Pages
 
+        // Extract settings with fallbacks to defaults
+        const settings = initialData?.royaltySettings || {
+          bw_printing_cost: 0.8,
+          color_printing_cost: 10,
+          hardcover_cost: 180,
+          paperback_cost: 100,
+          amazon_flipkart_royalty: 0.15,
+          general_royalty: 0.15
+        };
+
         const bindingType = (t.binding || details.binding || "").toLowerCase();
         let A = t.bindingCost ?? details.bindingCost ?? 0; // Binding
         if (bindingType.includes("hardcover")) {
-          A = 180;
+          A = settings.hardcover_cost;
         } else if (bindingType.includes("paperback")) {
-          A = 100;
+          A = settings.paperback_cost;
         }
 
         const E = t.sizeCost || details.sizeCost || 0; // Book Size
 
-        // Cost Price formula: ((B - D) * 0.8) + (D * 10) + A + E
-        const calculatedCostPrice = ((B - D) * 0.8) + (D * 10) + A + E;
+        // Cost Price formula: ((B - D) * bw_cost) + (D * color_cost) + A + E
+        const calculatedCostPrice = ((B - D) * settings.bw_printing_cost) + (D * settings.color_printing_cost) + A + E;
         const J = t.costPrice || details.costPrice || calculatedCostPrice; // Cost Price
 
         let royaltyPerBook = 0;
         if (platformMatch === "Amazon" || platformMatch === "Flipkart") {
-          royaltyPerBook = H - ((B * 0.15) + J + (0.15 * H));
+          royaltyPerBook = H - ((B * settings.amazon_flipkart_royalty) + J + (settings.amazon_flipkart_royalty * H));
         } else {
-          royaltyPerBook = H - ((B * 0.15) + J);
+          royaltyPerBook = H - ((B * settings.general_royalty) + J);
         }
 
 
@@ -355,7 +373,7 @@ export default function RoyaltyPageCo({ initialData, storeUrl = "http://localhos
       </div>
 
       {/* Summary Metric Cards (3-up) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
         {/* Card 1: Total Royalty */}
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
@@ -402,25 +420,6 @@ export default function RoyaltyPageCo({ initialData, storeUrl = "http://localhos
           </div>
         </div>
 
-        {/* Card 3: Royalty Rate Info */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-              Avg. Royalty Rate
-            </span>
-            <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
-              <Percent className="h-4 w-4 text-[#275697]" />
-            </div>
-          </div>
-          <div className="mt-3 text-2xl font-black text-slate-900">
-            {periodStats.gross > 0 ? ((periodStats.royalty / periodStats.gross) * 100).toFixed(1) : 0}%
-          </div>
-          <div className="mt-1 flex items-center gap-2">
-            <span className="text-xs font-medium text-slate-500">
-              {formatINR(periodStats.royalty)} from {formatINR(periodStats.gross)} gross
-            </span>
-          </div>
-        </div>
       </div>
 
       {/* Main Content Grid */}

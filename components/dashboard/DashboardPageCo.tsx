@@ -61,6 +61,7 @@ interface PlatformShare {
   name: string;
   value: number;
   color: string;
+  isPlaceholder?: boolean;
 }
 
 interface ActivityItem {
@@ -330,6 +331,9 @@ export default function DashboardPageCo({ profileData, salesData, reviewsData, b
     const platformTotals: Record<string, number> = {
       "Amazon": 0, "AGPH Store": 0, "Flipkart": 0, "Google Play": 0
     };
+    const platformUnits: Record<string, number> = {
+      "Amazon": 0, "AGPH Store": 0, "Flipkart": 0, "Google Play": 0
+    };
 
     const trendMap: Record<string, SalesTrendPoint> = {};
     for (let i = 0; i < 7; i++) {
@@ -373,6 +377,7 @@ export default function DashboardPageCo({ profileData, salesData, reviewsData, b
       if (platLower.includes("flipkart")) platKey = "Flipkart";
       if (platLower.includes("google") || platLower.includes("play")) platKey = "Google Play";
       platformTotals[platKey] += gross;
+      platformUnits[platKey] += units;
 
       const bTitle = t.bookTitle || t.book_title || "Unknown Book";
       if (!bookEarnings[t.book_id]) bookEarnings[t.book_id] = { units: 0, revenue: 0, title: bTitle };
@@ -470,9 +475,9 @@ export default function DashboardPageCo({ profileData, salesData, reviewsData, b
 
     // Platform share colors matching brand (Sky, Blue, Slate, Green)
     const PCOLORS: Record<string, string> = { "Amazon": "#1E3A8A", "AGPH Store": "#275697", "Flipkart": "#10B981", "Google Play": "#64748B" };
-    const platformsArr = Object.keys(platformTotals).filter(k => platformTotals[k] > 0).map(k => ({
+    const platformsArr: PlatformShare[] = Object.keys(platformUnits).filter(k => platformUnits[k] > 0).map(k => ({
       name: k,
-      value: Number(((platformTotals[k] / lifetimeEarnings) * 100).toFixed(1)) || 0,
+      value: platformUnits[k],
       color: PCOLORS[k] || "#000"
     }));
 
@@ -490,7 +495,7 @@ export default function DashboardPageCo({ profileData, salesData, reviewsData, b
         pendingActions: pipeBooks.filter(p => p.needsAttention).length,
       },
       salesTrend: Object.values(trendMap),
-      platformShare: platformsArr.length > 0 ? platformsArr : [{ name: "No Sales", value: 100, color: "#cbd5e1" }],
+      platformShare: platformsArr.length > 0 ? platformsArr : [{ name: "No Sales", value: 1, color: "#cbd5e1", isPlaceholder: true }],
       recentActivity: activities,
       pipelineBooks: pipeBooks,
       topBooks: sortedTopBooks,
@@ -557,23 +562,10 @@ export default function DashboardPageCo({ profileData, salesData, reviewsData, b
         )}
 
         {/* KPI CARDS */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-3">
           <StatCard label="This Month" value={formatINR(stats.thisMonthEarnings)} trend={earningsTrend} sublabel="vs last month" icon={DollarSign} />
           <StatCard label="Lifetime Earnings" value={formatINR(stats.lifetimeEarnings)} sublabel="all-time, all platforms" icon={Wallet} />
           <StatCard label="Books in Pipeline" value={String(stats.booksInPipeline)} sublabel={`${stats.publishedBooks} already published`} icon={BookOpen} />
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">Payout Progress</span>
-              <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
-                <Wallet className="h-4 w-4 text-[#275697]" />
-              </div>
-            </div>
-            <div className="mt-3 text-2xl font-black text-slate-900">{stats.payoutProgress}%</div>
-            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full bg-blue-900" style={{ width: `${stats.payoutProgress}%` }} />
-            </div>
-            <p className="mt-2 text-xs font-medium text-slate-500">Next payout {stats.nextPayoutDate}</p>
-          </div>
         </div>
 
         {/* CHARTS ROW */}
@@ -605,7 +597,7 @@ export default function DashboardPageCo({ profileData, salesData, reviewsData, b
                   <Pie data={platformShare} dataKey="value" nameKey="name" innerRadius={45} outerRadius={65} paddingAngle={2}>
                     {platformShare.map((entry, idx) => <Cell key={idx} fill={entry.color} stroke="none" />)}
                   </Pie>
-                  <Tooltip formatter={(value: number) => [`${value}%`, ""]} contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12, fontWeight: 600 }} />
+                  <Tooltip formatter={(value: number, name: string, props: any) => [props.payload.isPlaceholder ? "0 units" : `${value} units`, ""]} contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12, fontWeight: 600 }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -616,7 +608,7 @@ export default function DashboardPageCo({ profileData, salesData, reviewsData, b
                     <span className="h-3 w-3 rounded-md" style={{ backgroundColor: p.color }} />
                     {p.name}
                   </span>
-                  <span className="font-bold text-slate-900">{p.value}%</span>
+                  <span className="font-bold text-slate-900">{p.isPlaceholder ? "0 units" : `${p.value} units`}</span>
                 </div>
               ))}
             </div>
