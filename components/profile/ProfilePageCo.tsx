@@ -77,10 +77,50 @@ export default function ProfilePageCo({ initialProfileData, salesData, reviewsDa
 
 
 
-  if (!profileData) {
+  const [isLoading, setIsLoading] = useState(!initialProfileData);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!initialProfileData) {
+      getAuthorProfileData().then(data => {
+        if (data) {
+          setProfileData(data);
+        } else {
+          setError("Failed to load profile data.");
+        }
+        setIsLoading(false);
+      }).catch(err => {
+        console.error(err);
+        setError("Network error loading profile.");
+        setIsLoading(false);
+      });
+    }
+  }, [initialProfileData]);
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <Loader2 className="animate-spin text-[#4f46e5]" size={32} />
+      </div>
+    );
+  }
+
+  if (error || !profileData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
+        <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-4">
+          <X size={32} />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900 mb-2">Unable to load profile</h2>
+        <p className="text-sm text-slate-500 max-w-md mx-auto mb-6">
+          We couldn't retrieve your profile data. This may be due to a server configuration issue.
+        </p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-6 py-2 bg-slate-900 text-white font-medium rounded-lg hover:bg-slate-800 transition-colors"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
