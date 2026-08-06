@@ -23,8 +23,12 @@ export default function OnboardingWrapper({
     getAuthorProfileData().then((profile) => {
       if (profile) {
         setAuthorProfile(profile);
-        if (profile.isOnboarded === false) {
+        if (profile.isOnboarded === false || profile.isApproved === 2) {
           setCompleted(false);
+        }
+        if (profile.isApproved === 2) {
+          setIsSkipped(false); // Force them to see the form if rejected
+          localStorage.removeItem("onboarding_skipped");
         }
       }
       setLoading(false);
@@ -52,16 +56,18 @@ export default function OnboardingWrapper({
   return (
     <>
       {isSkipped && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center justify-between mb-4 shadow-sm">
+        <div className={`border rounded-lg p-3 flex items-center justify-between mb-4 shadow-sm ${authorProfile?.isApproved === 2 ? 'bg-rose-50 border-rose-200' : 'bg-amber-50 border-amber-200'}`}>
           <div className="flex items-center gap-3">
-            <AlertTriangle className="text-amber-500" size={20} />
-            <p className="text-sm font-medium text-amber-800">
-              Please complete your author onboarding form to avoid delays in publication and payouts.
+            <AlertTriangle className={authorProfile?.isApproved === 2 ? "text-rose-500" : "text-amber-500"} size={20} />
+            <p className={`text-sm font-medium ${authorProfile?.isApproved === 2 ? 'text-rose-800' : 'text-amber-800'}`}>
+              {authorProfile?.isApproved === 2 
+                ? `Your profile verification was rejected: ${authorProfile.remark}. Please update it.` 
+                : "Please complete your author onboarding form to avoid delays in publication and payouts."}
             </p>
           </div>
           <button 
             onClick={() => setIsSkipped(false)}
-            className="text-sm bg-amber-100 hover:bg-amber-200 text-amber-900 px-4 py-1.5 rounded-md font-semibold transition-colors"
+            className={`text-sm px-4 py-1.5 rounded-md font-semibold transition-colors ${authorProfile?.isApproved === 2 ? 'bg-rose-100 hover:bg-rose-200 text-rose-900' : 'bg-amber-100 hover:bg-amber-200 text-amber-900'}`}
           >
             Complete Now
           </button>

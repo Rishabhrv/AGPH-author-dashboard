@@ -13,6 +13,8 @@ import {
    ───────────────────────────────────────────────────────────────────────── */
 
 type IntakePath = "author_content" | "agph_written";
+const storeUrl = process.env.STORE_URL || "http://localhost:5000";
+const API_URL = process.env.API_URL || "http://localhost:5001";
 
 const ALL_STAGES = [
   "Content Received", "ISBN Assigned", "Cover Design", "Writing",
@@ -32,20 +34,11 @@ type EnrichedStep = {
 
 type Correction = {
   correction_id: number;
-  section: "writing" | "proofreading" | "formatting" | "cover";
-  correction_start: string | null;
-  correction_end: string | null;
-  worker: string | null;
-  notes: string | null;
+  target: "Manuscript" | "Cover Design";
+  created_at: string | null;
+  correction_text: string | null;
+  correction_file: string | null;
   round_number: number;
-  is_active: boolean;
-};
-
-const CORRECTION_SECTION_LABELS: Record<string, string> = {
-  writing: "Writing Correction",
-  proofreading: "Proofreading Correction",
-  formatting: "Formatting Correction",
-  cover: "Cover Correction",
 };
 
 const STAGE_ICONS: Record<Stage, React.ElementType> = {
@@ -97,6 +90,21 @@ type EnrichedBook = {
 function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[], approvals: string[]): EnrichedStep[] {
   const steps: EnrichedStep[] = [];
 
+  // ── Determine the high-water mark ──
+  // If a later milestone exists, all earlier steps are implicitly complete.
+  const hasStoreLinks = book.amazon_link || book.agph_link || book.flipkart_link || book.google_link;
+  const isPrintingDone = book.print_status === 1;
+  const isDigitalProofDone = book.digital_book_sent || book.proof_pdf_link || approvals.includes("digital_proof");
+  const isDispatched = !!book.delivery_date;
+
+  // Cascade: listing → dispatched → printing → digital proof → cover → content
+  const listingComplete = !!hasStoreLinks;
+  const dispatchComplete = listingComplete || isDispatched;
+  const printingComplete = dispatchComplete || isPrintingDone;
+  const digitalProofComplete = printingComplete || !!isDigitalProofDone;
+  const coverComplete = digitalProofComplete;
+  const contentComplete = coverComplete;
+
   // 1. Content Received (shown for all books)
   {
     let status: StepStatus = "Not Started";
@@ -106,7 +114,8 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
 
     let note = `Waiting for ${typeName.toLowerCase()} upload.`;
     const hasContent = (book.is_thesis_to_book || book.is_publish_only) ? book.manuscript_path : book.syllabus_path;
-    if (hasContent) {
+
+    if (contentComplete || hasContent) {
       status = "Completed";
       note = `${typeName} uploaded successfully.`;
     }
@@ -115,8 +124,12 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
 
   // 2. ISBN Assigned
   {
-    let status: StepStatus = book.isbn ? "Completed" : "Not Started";
-    let note = book.isbn ? `ISBN: ${book.isbn}` : "Pending ISBN assignment.";
+    let status: StepStatus = "Not Started";
+    let note = "Pending ISBN assignment.";
+    if (contentComplete || book.isbn) {
+      status = "Completed";
+      note = book.isbn ? `ISBN: ${book.isbn}` : "ISBN assigned.";
+    }
     steps.push({ stage: "ISBN Assigned", status, note, icon: STAGE_ICONS["ISBN Assigned"] });
   }
 
@@ -125,23 +138,26 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
     let status: StepStatus = "Not Started";
     let note = "Cover design pending.";
 
-    const hasActiveCoverCorr = corrections.some(c => c.is_active && (c.section === "cover" || c.section === "formatting"));
-    const isCoverApproved = approvals.includes("cover_design");
-    const isDigitalProofApproved = approvals.includes("digital_proof");
-
-    if (isCoverApproved || isDigitalProofApproved) {
-      // If digital proof is approved, cover is implicitly done too
+    if (coverComplete) {
       status = "Completed";
-      note = isCoverApproved ? "Cover design approved." : "Cover approved as part of digital proof.";
-    } else if (hasActiveCoverCorr) {
-      status = "Action Needed";
-      note = "Cover correction requested.";
-    } else if (book.cover_pdf_link) {
-      status = "Action Needed";
-      note = "Cover proof ready for approval.";
-    } else if (book.writing_end || intakePath === "author_content") {
-      status = "In Progress";
-      note = "Design work underway.";
+      note = "Cover design completed.";
+    } else {
+      const hasActiveCoverCorr = corrections.some(c => c.target === "Cover Design");
+      const isCoverApproved = approvals.includes("cover_design");
+
+      if (isCoverApproved) {
+        status = "Completed";
+        note = "Cover design approved.";
+      } else if (hasActiveCoverCorr) {
+        status = "Action Needed";
+        note = "Cover correction requested.";
+      } else if (book.cover_pdf_link) {
+        status = "Action Needed";
+        note = "Cover proof ready for approval.";
+      } else if (book.writing_end || intakePath === "author_content") {
+        status = "In Progress";
+        note = "Design work underway.";
+      }
     }
     steps.push({ stage: "Cover Design", status, note, icon: STAGE_ICONS["Cover Design"] });
   }
@@ -151,17 +167,18 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
     let status: StepStatus = "Not Started";
     let note = "Waiting for writers to start.";
 
-    const hasActiveWritingCorr = corrections.some(c => c.is_active && (c.section === "writing" || c.section === "proofreading"));
-
-    if (book.writing_end) {
+    if (digitalProofComplete || book.writing_end) {
       status = "Completed";
       note = "Writing and proofreading finished.";
-    } else if (hasActiveWritingCorr) {
-      status = "Action Needed";
-      note = "Writing correction requested.";
-    } else if (book.writing_start) {
-      status = "In Progress";
-      note = "Drafting currently in progress.";
+    } else {
+      const hasActiveWritingCorr = corrections.some(c => c.target === "Manuscript");
+      if (hasActiveWritingCorr) {
+        status = "Action Needed";
+        note = "Writing correction requested.";
+      } else if (book.writing_start) {
+        status = "In Progress";
+        note = "Drafting currently in progress.";
+      }
     }
     steps.push({ stage: "Writing", status, note, icon: STAGE_ICONS["Writing"] });
   }
@@ -171,16 +188,19 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
     let status: StepStatus = "Not Started";
     let note = "Digital proof pending.";
 
-    const isApproved = approvals.includes("digital_proof");
-    if (isApproved) {
+    if (digitalProofComplete) {
       status = "Completed";
-      note = "Digital proof approved.";
+      const isApproved = approvals.includes("digital_proof");
+      if (isApproved) {
+        note = "Digital proof approved.";
+      } else if (book.digital_book_sent) {
+        note = "Digital proof sent.";
+      } else {
+        note = "Digital proof completed.";
+      }
     } else if (book.proof_pdf_link) {
       status = "Action Needed";
       note = "Digital proof ready for approval.";
-    } else if (book.digital_book_sent) {
-      status = "Completed";
-      note = "Digital proof sent.";
     }
     steps.push({ stage: "Digital Proof", status, note, icon: STAGE_ICONS["Digital Proof"] });
   }
@@ -189,7 +209,8 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
   {
     let status: StepStatus = "Not Started";
     let note = "Pending print approval.";
-    if (book.print_status === 1) {
+
+    if (printingComplete) {
       status = "Completed";
       note = "Printing finished.";
     } else if (book.print_status === 0 && approvals.includes("digital_proof")) {
@@ -201,16 +222,20 @@ function deriveSteps(book: any, intakePath: IntakePath, corrections: Correction[
 
   // 7. Dispatched
   {
-    let status: StepStatus = book.delivery_date ? "Completed" : "Not Started";
-    let note = book.delivery_date ? `Dispatched on ${new Date(book.delivery_date).toLocaleDateString()}` : "Awaiting dispatch.";
+    let status: StepStatus = "Not Started";
+    let note = "Awaiting dispatch.";
+
+    if (dispatchComplete) {
+      status = "Completed";
+      note = book.delivery_date ? `Dispatched on ${new Date(book.delivery_date).toLocaleDateString()}` : "Dispatched.";
+    }
     steps.push({ stage: "Dispatched", status, note, icon: STAGE_ICONS["Dispatched"] });
   }
 
   // 8. Listed on Platforms
   {
-    const hasLinks = book.amazon_link || book.agph_link || book.flipkart_link || book.google_link;
-    let status: StepStatus = hasLinks ? "Completed" : "Not Started";
-    let note = hasLinks ? "Available for purchase!" : "Pending platform listings.";
+    let status: StepStatus = listingComplete ? "Completed" : "Not Started";
+    let note = listingComplete ? "Available for purchase!" : "Pending platform listings.";
     steps.push({ stage: "Listed on Platforms", status, note, icon: STAGE_ICONS["Listed on Platforms"] });
   }
 
@@ -829,7 +854,7 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
         </a>
       );
     }
-    
+
     return null;
   }
 
@@ -923,8 +948,8 @@ function StepActions({ step, book }: { step: EnrichedStep, book: EnrichedBook })
 function StepCorrections({ stage, corrections }: { stage: string, corrections: Correction[] }) {
   const filtered = corrections.filter((c) =>
     stage === "Writing"
-      ? c.section === "writing" || c.section === "proofreading"
-      : c.section === "cover" || c.section === "formatting"
+      ? c.target === "Manuscript"
+      : c.target === "Cover Design"
   );
 
   if (filtered.length === 0) return null;
@@ -936,12 +961,17 @@ function StepCorrections({ stage, corrections }: { stage: string, corrections: C
       </p>
       <div className="flex flex-col gap-1.5 max-h-32 overflow-y-auto pr-1">
         {filtered.map((c) => (
-          <div key={c.correction_id} className={`rounded-lg p-2 border ${c.is_active ? "bg-amber-100/50 border-amber-200" : "bg-white/40 border-slate-200"}`}>
+          <div key={c.correction_id} className={`rounded-lg p-2 border bg-white/40 border-slate-200`}>
             <div className="flex items-center justify-between mb-1">
-              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${c.is_active ? "bg-amber-500 text-white" : "bg-slate-100 text-slate-500"}`}>R{c.round_number}</span>
-              <span className={`text-[9px] font-bold ${c.is_active ? "text-amber-700" : "text-emerald-700"}`}>{c.is_active ? "In Progress" : "Done"}</span>
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500`}>R{c.round_number}</span>
+              <span className={`text-[9px] font-bold text-slate-500`}>Submitted</span>
             </div>
-            {c.notes && <p className="text-[10px] leading-snug opacity-70 line-clamp-2" title={c.notes}>{c.notes}</p>}
+            {c.correction_text && <p className="text-[10px] leading-snug opacity-70 line-clamp-2" title={c.correction_text}>{c.correction_text}</p>}
+            {c.correction_file && (
+              <a href={c.correction_file} target="_blank" rel="noreferrer" className="mt-1.5 inline-flex items-center gap-1 text-[9px] font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-2 py-1 rounded transition-colors">
+                <FileText size={10} /> View Attached File
+              </a>
+            )}
           </div>
         ))}
       </div>
@@ -954,13 +984,14 @@ function StepCorrections({ stage, corrections }: { stage: string, corrections: C
    ───────────────────────────────────────────────────────────────────────── */
 
 const SECTION_OPTIONS = [
-  { value: "writing", label: "Writing", description: "Factual errors, missing content, or language issues" },
-  { value: "cover", label: "Cover Design", description: "Changes to front/back cover artwork or text" },
+  { value: "Manuscript", label: "Manuscript", description: "Factual errors, missing content, or language issues" },
+  { value: "Cover Design", label: "Cover Design", description: "Changes to front/back cover artwork or text" },
 ];
 
 function CorrectionRequestModal({ bookId, defaultSection, onClose }: { bookId: number; defaultSection: string; onClose: () => void }) {
   const [section, setSection] = useState(defaultSection);
   const [notes, setNotes] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -972,14 +1003,20 @@ function CorrectionRequestModal({ bookId, defaultSection, onClose }: { bookId: n
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!notes.trim()) { setErrorMsg("Please describe what needs to be corrected."); return; }
+    if (!notes.trim() && !file) { setErrorMsg("Please provide notes or a file describing the correction."); return; }
     setStatus("loading");
     setErrorMsg("");
     try {
-      const res = await fetch(`/api/correction-request?bookId=${bookId}&section=${section}`, {
+      const formData = new FormData();
+      formData.append("target", section);
+      formData.append("notes", notes.trim());
+      if (file) {
+        formData.append("file", file);
+      }
+
+      const res = await fetch(`${API_URL}/api/author/books-progress/${bookId}/request-correction`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ notes: notes.trim() }),
+        body: formData,
       });
       const data = await res.json();
       if (data.success) {
@@ -995,8 +1032,8 @@ function CorrectionRequestModal({ bookId, defaultSection, onClose }: { bookId: n
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-8">
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
@@ -1034,8 +1071,24 @@ function CorrectionRequestModal({ bookId, defaultSection, onClose }: { bookId: n
             </div>
             <div>
               <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wide block mb-3">Describe the correction</label>
-              <textarea value={notes} onChange={(e) => { setNotes(e.target.value); setErrorMsg(""); }} rows={4} placeholder="e.g. On page 12, the author's name is misspelled..." className="w-full text-[13px] font-medium text-slate-900 bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all resize-none placeholder:text-slate-500" />
-              {errorMsg && <p className="text-[12px] font-medium text-red-600 mt-2 flex items-center gap-1.5"><AlertTriangle size={12} /> {errorMsg}</p>}
+              <textarea value={notes} onChange={(e) => { setNotes(e.target.value); setErrorMsg(""); }} rows={3} placeholder="e.g. On page 12, the author's name is misspelled..." className="w-full text-[13px] font-medium text-slate-900 bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all resize-none placeholder:text-slate-500 mb-3" />
+
+              <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wide block mb-2">Attach a File (Optional)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    const selected = e.target.files?.[0];
+                    if (selected) {
+                      setFile(selected);
+                      setErrorMsg("");
+                    }
+                  }}
+                  className="block w-full text-[12px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[12px] file:font-bold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 transition-colors"
+                />
+              </div>
+
+              {errorMsg && <p className="text-[12px] font-medium text-red-600 mt-3 flex items-center gap-1.5"><AlertTriangle size={12} /> {errorMsg}</p>}
             </div>
             <div className="flex gap-3 pt-2">
               <button type="button" onClick={onClose} className="flex-1 text-[13px] font-bold text-slate-500 bg-slate-100 px-4 py-3 rounded-xl hover:bg-slate-100 transition-colors">Cancel</button>

@@ -4,12 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const bookId = searchParams.get("bookId");
-  const section = searchParams.get("section");
 
-  if (!bookId || !section) {
-    return NextResponse.json({ success: false, message: "Missing bookId or section" }, { status: 400 });
+  if (!bookId) {
+    return NextResponse.json({ success: false, message: "Missing bookId" }, { status: 400 });
   }
-  
 
   const token = cookies().get("auth_token")?.value;
   if (!token) {
@@ -19,17 +17,16 @@ export async function POST(request: NextRequest) {
   const apiUrl = process.env.API_URL || "http://localhost:5001";
 
   try {
-    const body = await request.json();
+    const formData = await request.formData();
 
     const res = await fetch(
       `${apiUrl}/api/author/books-progress/${bookId}/request-correction`,
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ section, notes: body.notes }),
+        body: formData,
         cache: "no-store",
       }
     );

@@ -456,29 +456,34 @@ export default function ProfilePageCo({ initialProfileData, salesData, reviewsDa
 
       {/* Right Sidebar Overlay & Panel (Personal Details) */}
       <div
-        className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity ${isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40 transition-opacity duration-300 ${isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         onClick={() => setIsSidebarOpen(false)}
       />
-      <div className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}`}>
-        <div className="p-6 flex items-center justify-between border-b border-slate-200 sticky top-0 bg-white z-10">
+      <div className={`fixed top-0 right-0 h-full w-full max-w-[400px] bg-[#f4f7fb] shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}`}>
+        {/* Header */}
+        <div className="px-6 py-5 flex items-center justify-between border-b border-slate-200 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#4f46e5]/10 text-[#4f46e5]">
-              <Settings size={18} />
+            <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
+              <Settings size={16} className="text-[#275697]" />
             </div>
             <div>
-              <h2 className="text-[15px] font-extrabold text-slate-900 leading-tight">Personal Details</h2>
-              <p className="text-[11px] font-medium text-slate-500">Only visible to you</p>
+              <h2 className="text-sm font-bold text-slate-900">Personal Details</h2>
+              <p className="text-xs font-medium text-slate-500">Only visible to you</p>
             </div>
           </div>
-          <button onClick={() => setIsSidebarOpen(false)} className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
-            <X size={16} />
+          <button onClick={() => setIsSidebarOpen(false)} className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors">
+            <X size={14} />
           </button>
         </div>
 
-        <div className="p-6 flex flex-col gap-6">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[13px] font-extrabold text-slate-500 uppercase tracking-wide">Account Information</h3>
+        <div className="flex flex-col">
+          {/* Account Information Card */}
+          <div className=" bg-white ">
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-[#275697]" />
+                <h3 className="text-sm font-bold text-slate-900">Account Information</h3>
+              </div>
               <button
                 onClick={async () => {
                   if (isEditing) {
@@ -501,148 +506,124 @@ export default function ProfilePageCo({ initialProfileData, salesData, reviewsDa
                   }
                 }}
                 disabled={isSaving}
-                className={`text-[11px] font-bold transition-colors disabled:opacity-50 flex items-center gap-1 px-3 py-1.5 rounded-full ${isEditing ? "text-white" : "text-slate-500 bg-slate-100 hover:bg-slate-100"
+                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1.5 ${isEditing
+                  ? "bg-[#275697] text-white hover:bg-[#1e4578]"
+                  : "bg-slate-50 border border-slate-100 text-slate-600 hover:bg-slate-100 hover:text-slate-800"
                   }`}
-                style={isEditing ? { background: BRAND_GRADIENT } : undefined}
               >
                 {isSaving && <Loader2 size={12} className="animate-spin" />}
-                {isEditing ? (isSaving ? "Saving..." : "Save") : "Edit"}
+                {isEditing ? (isSaving ? "Saving..." : "Save Changes") : "Edit"}
               </button>
             </div>
 
-            <div className="flex flex-col gap-4 mt-1">
-              <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Public Author Name</p>
-                {isEditing ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#4f46e5]/10 text-[#4f46e5] shrink-0">
-                      <User size={14} />
-                    </div>
+            <div className="p-5 space-y-4">
+              {/* Author Name */}
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                  <User size={14} className="text-[#275697]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold tracking-wider text-slate-500 uppercase mb-1">Public Author Name</p>
+                  {isEditing ? (
                     <input
                       value={profile.authorName}
                       onChange={e => setProfileData({ ...profile, authorName: e.target.value })}
-                      className="text-[13px] font-semibold text-slate-900 bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full"
+                      className="text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full focus:border-[#275697] focus:ring-2 focus:ring-[#275697]/10 transition-all"
                     />
-                  </div>
-                ) : (
-                  <p className="text-[13px] font-semibold text-slate-900 flex items-center gap-2.5">
-                    <span className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#4f46e5]/10 text-[#4f46e5] shrink-0"><User size={14} /></span>
-                    {profile.authorName}
-                  </p>
-                )}
+                  ) : (
+                    <p className="text-sm font-bold text-slate-900 truncate">{profile.authorName}</p>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Public Bio</p>
-                {isEditing ? (
-                  <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#4f46e5]/10 text-[#4f46e5] shrink-0 mt-0.5">
-                      <BookOpen size={14} />
-                    </div>
+              {/* Bio */}
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <BookOpen size={14} className="text-[#275697]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold tracking-wider text-slate-500 uppercase mb-1">Public Bio</p>
+                  {isEditing ? (
                     <textarea
                       value={profile.bio}
                       onChange={e => setProfileData({ ...profile, bio: e.target.value })}
-                      className="text-[13px] font-semibold text-slate-900 bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full resize-none"
+                      className="text-sm font-medium text-slate-900 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full resize-none focus:border-[#275697] focus:ring-2 focus:ring-[#275697]/10 transition-all"
                       rows={3}
                     />
-                  </div>
-                ) : (
-                  <p className="text-[13px] font-semibold text-slate-900 flex items-start gap-2.5">
-                    <span className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#4f46e5]/10 text-[#4f46e5] shrink-0"><BookOpen size={14} /></span>
-                    <span className="leading-snug mt-1.5 line-clamp-3">{profile.bio}</span>
-                  </p>
-                )}
+                  ) : (
+                    <p className="text-sm font-medium text-slate-700 leading-relaxed line-clamp-3">{profile.bio}</p>
+                  )}
+                </div>
               </div>
 
-              <div className="h-px bg-slate-100 my-1" />
+              <div className="h-px bg-slate-100" />
 
-              <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Private Legal Name</p>
-                {isEditing ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#4f46e5]/10 text-[#4f46e5] shrink-0">
-                      <User size={14} />
-                    </div>
-                    <input
-                      value={profile.legalName}
-                      onChange={e => setProfileData({ ...profile, legalName: e.target.value })}
-                      className="text-[13px] font-semibold text-slate-900 bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full"
-                    />
-                  </div>
-                ) : (
-                  <p className="text-[13px] font-semibold text-slate-900 flex items-center gap-2.5">
-                    <span className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#4f46e5]/10 text-[#4f46e5] shrink-0"><User size={14} /></span>
-                    {profile.legalName}
-                  </p>
-                )}
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email Address</p>
-                {isEditing ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#275697]/10 text-[#275697] shrink-0">
-                      <Mail size={14} />
-                    </div>
+              {/* Email */}
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                  <Mail size={14} className="text-[#275697]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold tracking-wider text-slate-500 uppercase mb-1">Email Address</p>
+                  {isEditing ? (
                     <input
                       value={profile.email}
                       onChange={e => setProfileData({ ...profile, email: e.target.value })}
-                      className="text-[13px] font-semibold text-slate-900 bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full"
+                      className="text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full focus:border-[#275697] focus:ring-2 focus:ring-[#275697]/10 transition-all"
                     />
-                  </div>
-                ) : (
-                  <p className="text-[13px] font-semibold text-slate-900 flex items-center gap-2.5">
-                    <span className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#275697]/10 text-[#275697] shrink-0"><Mail size={14} /></span>
-                    {profile.email}
-                  </p>
-                )}
+                  ) : (
+                    <p className="text-sm font-bold text-slate-900 truncate">{profile.email}</p>
+                  )}
+                </div>
               </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Phone Number</p>
-                {isEditing ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-500/10 text-emerald-600 shrink-0">
-                      <Phone size={14} />
-                    </div>
+
+              {/* Phone */}
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                  <Phone size={14} className="text-[#275697]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold tracking-wider text-slate-500 uppercase mb-1">Phone Number</p>
+                  {isEditing ? (
                     <input
                       value={profile.phone}
                       onChange={e => setProfileData({ ...profile, phone: e.target.value })}
-                      className="text-[13px] font-semibold text-slate-900 bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full"
+                      className="text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full focus:border-[#275697] focus:ring-2 focus:ring-[#275697]/10 transition-all"
                     />
-                  </div>
-                ) : (
-                  <p className="text-[13px] font-semibold text-slate-900 flex items-center gap-2.5">
-                    <span className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-500/10 text-emerald-600 shrink-0"><Phone size={14} /></span>
-                    {profile.phone}
-                  </p>
-                )}
+                  ) : (
+                    <p className="text-sm font-bold text-slate-900">{profile.phone}</p>
+                  )}
+                </div>
               </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Residential Address</p>
-                {isEditing ? (
-                  <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#f59e0b]/10 text-[#f59e0b] shrink-0 mt-0.5">
-                      <MapPin size={14} />
-                    </div>
+
+              {/* Address */}
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <MapPin size={14} className="text-[#275697]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold tracking-wider text-slate-500 uppercase mb-1">Delivery Address</p>
+                  {isEditing ? (
                     <textarea
                       value={profile.address}
                       onChange={e => setProfileData({ ...profile, address: e.target.value })}
-                      className="text-[13px] font-semibold text-slate-900 bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full resize-none"
+                      className="text-sm font-medium text-slate-900 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 outline-none w-full resize-none focus:border-[#275697] focus:ring-2 focus:ring-[#275697]/10 transition-all"
                       rows={2}
                     />
-                  </div>
-                ) : (
-                  <p className="text-[13px] font-semibold text-slate-900 flex items-start gap-2.5">
-                    <span className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#f59e0b]/10 text-[#f59e0b] shrink-0"><MapPin size={14} /></span>
-                    <span className="leading-snug mt-1.5">{profile.address}</span>
-                  </p>
-                )}
+                  ) : (
+                    <p className="text-sm font-medium text-slate-700 leading-relaxed">{profile.address}</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="flex items-start gap-2 bg-slate-100 rounded-xl p-3.5 mt-2">
-            <Lock size={14} className="text-slate-500 mt-0.5 shrink-0" />
-            <p className="text-[11px] font-medium text-slate-500 leading-relaxed">
+          {/* Privacy Notice */}
+          <div className=" bg-white p-4 flex items-start gap-3">
+            <div className="rounded-lg bg-slate-50 border border-slate-100 p-2 shrink-0">
+              <Lock size={14} className="text-slate-400" />
+            </div>
+            <p className="text-xs font-medium text-slate-500 leading-relaxed">
               Your personal details are private and are never shown on your public author profile.
             </p>
           </div>
