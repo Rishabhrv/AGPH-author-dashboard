@@ -104,15 +104,36 @@ export async function getAuthorProfileData() {
       cache: "no-store"
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error("Profile fetch failed with status:", res.status);
+      return null;
+    }
 
     const data = await res.json();
-    if (data.success && data.profile) {
-      if (data.profile.profileImageUrl && data.profile.profileImageUrl.startsWith('/api/')) {
-        data.profile.profileImageUrl = `${apiUrl}${data.profile.profileImageUrl}`;
+    
+    // Handle both wrapped {success: true, profile: {...}} and raw profile object
+    let profile = data.profile || data.data || data;
+
+    if (profile && typeof profile === 'object') {
+      // Fix profile image URL if necessary
+      if (profile.profileImageUrl && profile.profileImageUrl.startsWith('/api/')) {
+        profile.profileImageUrl = `${apiUrl}${profile.profileImageUrl}`;
       }
-      return data.profile;
+      
+      // Defensively map potential fields to expected AuthorProfile schema
+      profile.authorName = profile.authorName || profile.author_name || profile.name || profile.username || profile.legalName || profile.legal_name || "Author";
+      profile.legalName = profile.legalName || profile.legal_name || profile.authorName;
+      profile.bio = profile.bio || profile.bio_override || "";
+      profile.email = profile.email || profile.email_override || profile.username || "";
+      profile.phone = profile.phone || profile.phone_override || "";
+      profile.address = profile.address || profile.full_address || "";
+      profile.totalBooks = profile.totalBooks || profile.total_books || (profile.books ? profile.books.length : 0);
+      profile.memberSince = profile.memberSince || profile.member_since || "Recent";
+      profile.socials = profile.socials || [];
+      
+      return profile;
     }
+
     return null;
   } catch (e) {
     console.error("Profile fetch error:", e);
